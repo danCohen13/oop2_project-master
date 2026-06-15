@@ -10,16 +10,28 @@ public:
     LevelGenerator();
     ~LevelGenerator() = default;
 
-    void generate(float deltaTime, std::vector<std::unique_ptr<Object>>& objects, Player& player);
+    void generate(float deltaTime,
+        std::vector<std::unique_ptr<Object>>& objects,
+        Player& player);
 
 private:
-    float m_nextSpawnX;
+    // --- Sous-responsabilites privees ---
+    void  spawnMissiles(float deltaTime,
+        std::vector<std::unique_ptr<Object>>& objects,
+        Player& player, float playerX);
 
-    // NOUVEAU : Infrastructure de chronométrage indépendante pour les missiles
+    float spawnLaser(std::vector<std::unique_ptr<Object>>& objects,
+        float spawnX);
+
+    // --- Etat ---
+    float m_nextSpawnX;
     float m_missileTimer;
     float m_nextMissileDelay;
 
-    const float COIN_SPACING = 40.0f;
-    const float CEILING_LIMIT = 50.0f;
-    const float FLOOR_LIMIT = 530.0f;
+    // --- Constantes ---
+    static constexpr float COIN_SPACING = 48.0f;
+    static constexpr float CEILING_LIMIT = 50.0f;
+    static constexpr float FLOOR_LIMIT = 530.0f;
+    static constexpr float DISTANCE_SECURITE_DEBUT = 15000.0f;
+    static constexpr float LASER_RADIUS = 175.0f;
 };

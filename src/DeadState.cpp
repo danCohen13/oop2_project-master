@@ -14,16 +14,30 @@ DeadState::DeadState()
 }
 
 void DeadState::update(Player& player, float deltaTime) {
-    // 1. Force l'application de la texture de mort (PlayerDead.png)
     player.getSprite().setTexture(Resources::getInstance().getTexture("PlayerDead"));
 
-    // 2. Met à jour le chronomètre de l'animateur par composition
-    m_animator.update(deltaTime);
+    if (!m_finished) {
+        bool frameChanged = m_animator.update(deltaTime);
+        m_animator.applyTo(player.getSprite());
 
-    // 3. Écrase le rectangle de texture hérité des états de vie (course/saut)
-    m_animator.applyTo(player.getSprite());
+        if (frameChanged) {
+            m_started = true; // au moins un changement de frame a eu lieu
+        }
 
-    // 4. Désactive les flammes du jetpack
+        // On détecte le wrap-around SEULEMENT après avoir démarré
+        if (m_started && m_animator.getCurrentFrame() == 0) {
+            m_finished = true;
+            // Forcer manuellement la DERNIÈRE frame (frame 4 sur 5)
+            const sf::Texture& tex = Resources::getInstance().getTexture("PlayerDead");
+            int totalFrames = static_cast<int>(tex.getSize().x / tex.getSize().y);
+            int fw = tex.getSize().x / totalFrames;
+            int fh = tex.getSize().y;
+            player.getSprite().setTextureRect(
+                sf::IntRect({ (totalFrames - 1) * fw, 0 }, { fw, fh })
+            );
+        }
+    }
+
     player.getExhaust().setActive(false);
 }
 

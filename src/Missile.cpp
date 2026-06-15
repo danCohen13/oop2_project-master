@@ -9,12 +9,13 @@ int determineFrameCount(const sf::Texture& texture) {
     return (count > 0) ? count : 1;
 }
 
-Missile::Missile(Player& player)
+// CORRECTION VISÉE : La signature correspond maintenant exactement à Missile.h
+Missile::Missile(Player& player, float yOffset)
     : MovingGameObject(Resources::getInstance().getTexture("Missile"), 650.0f),
     m_player(player),
     m_status(MissileStatus::Warning),
-    m_missileAnimator(Resources::getInstance().getTexture("Missile"), 7, 0.05f), // Fixé à 7 et validé OK !
-    // CORRECTION : Déduction automatique du nombre de frames pour tes fichiers d'alertes
+    m_yOffset(yOffset), // Initialisé au bon endroit selon l'ordre de déclaration de Missile.h
+    m_missileAnimator(Resources::getInstance().getTexture("Missile"), 7, 0.05f),
     m_warningAnimator(Resources::getInstance().getTexture("MissileWarning"), determineFrameCount(Resources::getInstance().getTexture("MissileWarning")), 0.08f),
     m_incomingAnimator(Resources::getInstance().getTexture("MissileIncoming"), determineFrameCount(Resources::getInstance().getTexture("MissileIncoming")), 0.05f),
     m_warningSprite(Resources::getInstance().getTexture("MissileWarning")),
@@ -44,31 +45,38 @@ void Missile::update(float deltaTime) {
     if (m_status == MissileStatus::Warning) {
         m_warningTimer += deltaTime;
 
-        float targetY = m_player.getPosition().y + 40.0f;
+        // Calcul de la hauteur cible (bloquée dans les limites du hangar)
+        float targetY = m_player.getPosition().y + 40.0f + m_yOffset;
+        if (targetY < 60.0f)  targetY = 60.0f;
+        if (targetY > 520.0f) targetY = 520.0f;
+
+        // Positionnement sur le bord droit de l'écran visible
         float warningX = cameraX + (VIRTUAL_SCREEN_WIDTH / 2.0f) - 45.0f;
 
         m_warningSprite.setPosition({ warningX, targetY });
         m_sprite.setPosition({ warningX, targetY });
 
+        // Gestion des deux étapes d'animation de l'alerte
         if (m_warningTimer > WARNING_DURATION * 0.7f) {
-            // Bascule dynamique sur l'animation de la flèche rouge d'impact imminent
-            m_warningSprite.setTexture(Resources::getInstance().getTexture("MissileIncoming"));
-
+            // ÉTAPE B : Flèche rouge d'impact imminent
             m_incomingAnimator.update(deltaTime);
             m_incomingAnimator.applyTo(m_warningSprite);
+            m_warningSprite.setTexture(Resources::getInstance().getTexture("MissileIncoming"));
 
             auto size = m_incomingAnimator.getFrameSize();
             m_warningSprite.setOrigin({ static_cast<float>(size.x) / 2.0f, static_cast<float>(size.y) / 2.0f });
         }
         else {
-            // Animation du point d'exclamation jaune
+            // ÉTAPE A : Point d'exclamation jaune standard
             m_warningAnimator.update(deltaTime);
             m_warningAnimator.applyTo(m_warningSprite);
+            m_warningSprite.setTexture(Resources::getInstance().getTexture("MissileWarning"));
 
             auto size = m_warningAnimator.getFrameSize();
             m_warningSprite.setOrigin({ static_cast<float>(size.x) / 2.0f, static_cast<float>(size.y) / 2.0f });
         }
 
+        // FIN DU TIMER : LANCEMENT DU MISSILE
         if (m_warningTimer >= WARNING_DURATION) {
             m_status = MissileStatus::Flying;
             m_sprite.setPosition({ cameraX + (VIRTUAL_SCREEN_WIDTH / 2.0f) + 80.0f, targetY });

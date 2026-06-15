@@ -15,4 +15,6 @@ public:
 
 private:
     SpriteAnimator m_animator; // L'état possède son propre animateur de mort
+    bool m_finished = false;
+    bool m_started = false;
 };

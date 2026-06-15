@@ -8,7 +8,7 @@ class Missile : public MovingGameObject {
 public:
     enum class MissileStatus { Warning, Flying };
 
-    Missile(Player& player);
+    Missile(Player& player, float yOffset = 0.0f);
     virtual ~Missile() = default;
 
     virtual void update(float deltaTime) override;
@@ -16,7 +16,7 @@ public:
     virtual void collide(Object& other) override;
     virtual void collide(Player& player) override;
 
-    virtual bool isDisposed() const override { return m_isDisposed; }
+    virtual bool isDisposed() const override { return m_isDisposed; };
 
 private:
     Player& m_player;
@@ -30,6 +30,8 @@ private:
     mutable sf::Sprite m_warningSprite;
     float m_warningTimer;
     bool m_isDisposed;
+
+    float m_yOffset;
 
     const float WARNING_DURATION = 2.0f;
     const float VIRTUAL_SCREEN_WIDTH = 800.0f;

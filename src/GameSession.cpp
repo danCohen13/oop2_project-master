@@ -16,7 +16,7 @@ void GameSession::update(float deltaTime, bool isThrusting) {
     else {
         // Si mort, on freine progressivement le défilement pour un arrêt dramatique
         if (m_gameSpeed > 0.0f) {
-            m_gameSpeed -= 400.0f * deltaTime;
+            m_gameSpeed -= 120.0f * deltaTime;
             if (m_gameSpeed < 0.0f) {
                 m_gameSpeed = 0.0f;
             }
