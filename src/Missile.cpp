@@ -3,21 +3,36 @@
 #include "Resources.h"
 #include <cmath>
 
+// Fonction d'ingénierie pour déduire le nombre de frames de tes icônes carrées
+int determineFrameCount(const sf::Texture& texture) {
+    int count = static_cast<int>(texture.getSize().x / texture.getSize().y);
+    return (count > 0) ? count : 1;
+}
+
 Missile::Missile(Player& player)
     : MovingGameObject(Resources::getInstance().getTexture("Missile"), 650.0f),
     m_player(player),
     m_status(MissileStatus::Warning),
-    m_animator(Resources::getInstance().getTexture("Missile"), 4, 0.05f),
+    m_missileAnimator(Resources::getInstance().getTexture("Missile"), 7, 0.05f), // Fixé à 7 et validé OK !
+    // CORRECTION : Déduction automatique du nombre de frames pour tes fichiers d'alertes
+    m_warningAnimator(Resources::getInstance().getTexture("MissileWarning"), determineFrameCount(Resources::getInstance().getTexture("MissileWarning")), 0.08f),
+    m_incomingAnimator(Resources::getInstance().getTexture("MissileIncoming"), determineFrameCount(Resources::getInstance().getTexture("MissileIncoming")), 0.05f),
     m_warningSprite(Resources::getInstance().getTexture("MissileWarning")),
     m_warningTimer(0.0f),
     m_isDisposed(false)
 {
-    m_animator.applyTo(m_sprite);
-    auto missileSize = m_animator.getFrameSize();
+    // Initialisation et centrage de la frame unique du missile
+    m_missileAnimator.applyTo(m_sprite);
+    auto missileSize = m_missileAnimator.getFrameSize();
     m_sprite.setOrigin({ static_cast<float>(missileSize.x) / 2.0f, static_cast<float>(missileSize.y) / 2.0f });
 
-    auto warningTexSize = Resources::getInstance().getTexture("MissileWarning").getSize();
-    m_warningSprite.setOrigin({ static_cast<float>(warningTexSize.x) / 2.0f, static_cast<float>(warningTexSize.y) / 2.0f });
+    // Initialisation et centrage de la première frame du warning jaune
+    m_warningAnimator.applyTo(m_warningSprite);
+    auto warningSize = m_warningAnimator.getFrameSize();
+    m_warningSprite.setOrigin({ static_cast<float>(warningSize.x) / 2.0f, static_cast<float>(warningSize.y) / 2.0f });
+
+    // Sécurité indispensable anti-ObjectCleaner
+    m_sprite.setPosition({ player.getPosition().x + 2000.0f, 0.0f });
 }
 
 void Missile::update(float deltaTime) {
@@ -31,14 +46,27 @@ void Missile::update(float deltaTime) {
 
         float targetY = m_player.getPosition().y + 40.0f;
         float warningX = cameraX + (VIRTUAL_SCREEN_WIDTH / 2.0f) - 45.0f;
-        m_warningSprite.setPosition({ warningX, targetY });
 
-        // CORRECTION / FIX ANTI-CLEANUP : On déplace aussi m_sprite ici !
-        // Comme warningX est devant le joueur, l'ObjectCleaner ne supprimera plus le missile.
+        m_warningSprite.setPosition({ warningX, targetY });
         m_sprite.setPosition({ warningX, targetY });
 
         if (m_warningTimer > WARNING_DURATION * 0.7f) {
+            // Bascule dynamique sur l'animation de la flèche rouge d'impact imminent
             m_warningSprite.setTexture(Resources::getInstance().getTexture("MissileIncoming"));
+
+            m_incomingAnimator.update(deltaTime);
+            m_incomingAnimator.applyTo(m_warningSprite);
+
+            auto size = m_incomingAnimator.getFrameSize();
+            m_warningSprite.setOrigin({ static_cast<float>(size.x) / 2.0f, static_cast<float>(size.y) / 2.0f });
+        }
+        else {
+            // Animation du point d'exclamation jaune
+            m_warningAnimator.update(deltaTime);
+            m_warningAnimator.applyTo(m_warningSprite);
+
+            auto size = m_warningAnimator.getFrameSize();
+            m_warningSprite.setOrigin({ static_cast<float>(size.x) / 2.0f, static_cast<float>(size.y) / 2.0f });
         }
 
         if (m_warningTimer >= WARNING_DURATION) {
@@ -49,17 +77,16 @@ void Missile::update(float deltaTime) {
     else if (m_status == MissileStatus::Flying) {
         m_sprite.move({ -m_speed * deltaTime, 0.0f });
 
-        if (m_animator.update(deltaTime)) {
-            m_animator.applyTo(m_sprite);
+        // Animation de la flamme arrière du missile
+        if (m_missileAnimator.update(deltaTime)) {
+            m_missileAnimator.applyTo(m_sprite);
         }
     }
 }
 
 void Missile::draw(sf::RenderWindow& window) const {
     if (m_status == MissileStatus::Warning) {
-        if (static_cast<int>(m_warningTimer / 0.15f) % 2 == 0) {
-            window.draw(m_warningSprite);
-        }
+        window.draw(m_warningSprite);
     }
     else if (m_status == MissileStatus::Flying) {
         window.draw(m_sprite);

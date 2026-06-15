@@ -16,15 +16,13 @@ void GameplayScreen::handleEvent(const sf::Event& event) {
 }
 
 void GameplayScreen::update(float deltaTime) {
-    // Si la partie est perdue, on gèle l'update
-    if (m_session.isGameOver()) return;
+    // CORRECTION : Au lieu de figer l'écran, on coupe juste les commandes de saut si Game Over
+    bool isThrusting = m_session.isGameOver() ? false : m_inputHandler.isThrustingActive();
 
-    bool isThrusting = m_inputHandler.isThrustingActive();
-
-    // 1. Mise à jour des règles métier et de la physique
+    // 1. On laisse la mise à jour s'exécuter (permet au DeadState du joueur de tourner !)
     m_session.update(deltaTime, isThrusting);
 
-    // 2. Synchronisation de l'affichage avec les données actuelles
+    // 2. Synchronisation de l'affichage de l'interface
     m_hud.updateTexts(m_session.getScore(), m_session.getLives(), m_session.getDistanceInMeters());
 
     // 3. Défilement de l'arrière-plan

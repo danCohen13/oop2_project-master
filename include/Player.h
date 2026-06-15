@@ -7,7 +7,7 @@ class PlayerState;
 
 class Player : public MovingGameObject {
 public:
-    enum class MovementType { Walking, Jumping };
+    enum class MovementType { Walking, Jumping, Dying };
 
     Player();
     virtual ~Player() = default;

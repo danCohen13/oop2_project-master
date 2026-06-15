@@ -13,6 +13,7 @@ Controller::Controller()
     resources.loadTexture("start_background", "resources/GameMenu.png");
     resources.loadTexture("background", "resources/Hall.png");
     resources.loadTexture("player", "resources/JetpackWalking.png");
+    resources.loadTexture("PlayerDead", "resources/PlayerDead.png"); 
     resources.loadFont("resources/New Athletic M54.ttf");
     resources.loadTexture("Exhaust", "resources/Exhaust.png");
     resources.loadTexture("Coin", "resources/Coin.png");

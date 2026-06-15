@@ -16,18 +16,20 @@ public:
     virtual void collide(Object& other) override;
     virtual void collide(Player& player) override;
 
-    // NOUVEAU : On surcharge la méthode pour indiquer à l'ObjectCleaner de nous détruire
     virtual bool isDisposed() const override { return m_isDisposed; }
 
 private:
     Player& m_player;
     MissileStatus m_status;
-    SpriteAnimator m_animator;
+
+    // Des animateurs spécialisés pour chaque texture
+    SpriteAnimator m_missileAnimator;
+    SpriteAnimator m_warningAnimator;
+    SpriteAnimator m_incomingAnimator;
 
     mutable sf::Sprite m_warningSprite;
     float m_warningTimer;
-
-    bool m_isDisposed; // NOUVEAU : Flag d'état interne
+    bool m_isDisposed;
 
     const float WARNING_DURATION = 2.0f;
     const float VIRTUAL_SCREEN_WIDTH = 800.0f;

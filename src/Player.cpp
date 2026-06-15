@@ -2,13 +2,13 @@
 #include "Resources.h"
 #include "WalkState.h"
 #include "JumpState.h"
+#include "DeadState.h" // CORRECTION : Ne pas oublier d'inclure le DeadState !
 
 Player::Player()
     : MovingGameObject(Resources::getInstance().getTexture("player"), 300.0f),
     m_verticalVelocity(0.0f),
     m_isDead(false),
     m_isThrusting(false),
-    // CORRECTION : m_flameSprite a été retiré d'ici car m_exhaust s'initialise tout seul !
     m_floorY(550.0f),
     m_state(std::make_unique<WalkState>()),
     m_currentMovement(MovementType::Walking)
@@ -16,25 +16,32 @@ Player::Player()
     m_sprite.setPosition({ 100.0f, 300.0f });
 
     const sf::Texture& playerTex = Resources::getInstance().getTexture("player");
-    int playerWidth = playerTex.getSize().x / 4;
-    int playerHeight = playerTex.getSize().y;
+    int playerWidth = static_cast<int>(playerTex.getSize().x) / 4;
+    int playerHeight = static_cast<int>(playerTex.getSize().y);
     m_sprite.setTextureRect(sf::IntRect({ 0, 0 }, { playerWidth, playerHeight }));
 
     m_floorY = 600.0f - static_cast<float>(playerHeight) - 20.0f;
-
-    // CORRECTION : Tout l'ancien code de découpage manuel de m_flameSprite a été supprimé.
 }
 
 void Player::update(float deltaTime, bool isThrusting) {
-    if (m_isDead) return;
-
-    m_isThrusting = isThrusting;
+    // CORRECTION : Plus de return hâtif. On gère la transition vers l'état de mort
+    if (m_isDead && m_currentMovement != MovementType::Dying) {
+        m_state = std::make_unique<DeadState>();
+        m_currentMovement = MovementType::Dying;
+        m_isThrusting = false;
+    }
 
     // 1. CALCULS PHYSIQUES
-    m_verticalVelocity += GRAVITY * deltaTime;
-
-    if (m_isThrusting) {
-        m_verticalVelocity = JETPACK_FORCE;
+    if (m_isDead) {
+        // Si le joueur est mort, il n'a plus de jetpack, il subit juste la gravité
+        m_verticalVelocity += GRAVITY * deltaTime;
+    }
+    else {
+        m_isThrusting = isThrusting;
+        m_verticalVelocity += GRAVITY * deltaTime;
+        if (m_isThrusting) {
+            m_verticalVelocity = JETPACK_FORCE;
+        }
     }
 
     m_sprite.move({ 0.0f, m_verticalVelocity * deltaTime });
@@ -47,27 +54,29 @@ void Player::update(float deltaTime, bool isThrusting) {
     }
     else if (position.y <= CEILING_Y) {
         m_sprite.setPosition({ position.x, CEILING_Y });
-        m_verticalVelocity = 0.0f;
+        if (!m_isDead) m_verticalVelocity = 0.0f;
     }
 
-    // 2. GESTION DES TRANSITIONS
-    bool isOnGround = (m_sprite.getPosition().y >= m_floorY);
+    // 2. GESTION DES TRANSITIONS (Uniquement si vivant)
+    if (!m_isDead) {
+        bool isOnGround = (m_sprite.getPosition().y >= m_floorY);
 
-    if (isOnGround && m_currentMovement != MovementType::Walking) {
-        m_state = std::make_unique<WalkState>();
-        m_currentMovement = MovementType::Walking;
-    }
-    else if (!isOnGround && m_currentMovement != MovementType::Jumping) {
-        m_state = std::make_unique<JumpState>();
-        m_currentMovement = MovementType::Jumping;
+        if (isOnGround && m_currentMovement != MovementType::Walking) {
+            m_state = std::make_unique<WalkState>();
+            m_currentMovement = MovementType::Walking;
+        }
+        else if (!isOnGround && m_currentMovement != MovementType::Jumping) {
+            m_state = std::make_unique<JumpState>();
+            m_currentMovement = MovementType::Jumping;
+        }
     }
 
-    // 3. DELEGATION DE L'ANIMATION À L'ÉTAT
+    // 3. DELEGATION DE L'ANIMATION À L'ÉTAT (Fonctionne aussi pour le DeadState)
     m_state->update(*this, deltaTime);
 }
 
 void Player::draw(sf::RenderWindow& window) const {
-    // CORRECTION : On passe l'objet exhaust à la fonction de dessin de l'état
+    // CORRECTION : On passe le sprite et l'exhaust en respectant la nouvelle signature
     m_state->draw(window, m_sprite, m_exhaust);
 }
 

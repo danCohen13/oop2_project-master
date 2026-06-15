@@ -6,27 +6,42 @@ GameSession::GameSession()
 }
 
 void GameSession::update(float deltaTime, bool isThrusting) {
-    // La vitesse augmente en permanence
-    if (m_gameSpeed < 900.0f) {
-        m_gameSpeed += 3.5f * deltaTime;
+    // 1. GESTION DE LA VITESSE ET DU FREINAGE (FRICTION)
+    if (!isGameOver()) {
+        // Si vivant, le jeu accélère normalement
+        if (m_gameSpeed < 900.0f) {
+            m_gameSpeed += 3.5f * deltaTime;
+        }
+    }
+    else {
+        // Si mort, on freine progressivement le défilement pour un arrêt dramatique
+        if (m_gameSpeed > 0.0f) {
+            m_gameSpeed -= 400.0f * deltaTime;
+            if (m_gameSpeed < 0.0f) {
+                m_gameSpeed = 0.0f;
+            }
+        }
     }
 
-    // On donne le top départ à la physique
+    // 2. Mise à jour physique du monde
     m_board.play(deltaTime, m_gameSpeed, isThrusting);
 
-    // On récupère les fruits du travail du Board
-    int coins = m_board.getCoinsCollectedThisFrame();
-    if (coins > 0) {
-        addScore(1); // +10 points par pièce ramassée !
-    }
+    // 3. RÈGLES DE JEU (Uniquement si la partie est encore active !)
+    if (!isGameOver()) {
+        int coins = m_board.getCoinsCollectedThisFrame();
+        if (coins > 0) {
+            addScore(1);
+        }
 
-    if (m_board.hasPlayerHitHazard()) {
-        removeLife();
+        // CORRECTION : N'est lu que si le jeu n'est pas déjà considéré en Game Over
+        if (m_board.hasPlayerHitHazard()) {
+            removeLife(); // Appelé une seule fois, m_lives passe à 0, bloquant le prochain tick !
+        }
     }
 }
 
 void GameSession::drawWorld(sf::RenderWindow& window) const {
-    m_board.draw(window); // Délègue le dessin au moteur physique
+    m_board.draw(window);
 }
 
 int GameSession::getScore() const { return m_score; }
@@ -36,14 +51,9 @@ sf::Vector2f GameSession::getPlayerPosition() const { return m_board.getPlayerPo
 
 int GameSession::getDistanceInMeters() const {
     float playerX = getPlayerPosition().x;
-
-    // Le joueur commence à X = 100, on soustrait 100 pour démarrer à 0m.
     float distanceInPixels = playerX - 100.0f;
-
-    // Règle de conversion : 100 pixels = 1 mètre
     int meters = static_cast<int>(distanceInPixels / 100.0f);
-
-    return (meters < 0) ? 0 : meters; // Sécurité pour éviter les nombres négatifs au tout début
+    return (meters < 0) ? 0 : meters;
 }
 
 void GameSession::addScore(int points) { m_score += points; }
