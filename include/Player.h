@@ -1,14 +1,13 @@
 ﻿#pragma once
 #include "MovingGameObject.h"
 #include "Exhaust.h"
-#include "SpriteAnimator.h"
 #include <memory>
 
 class PlayerState;
 
 class Player : public MovingGameObject {
 public:
-    enum class MovementType { Walking, Jumping, Dying };
+    enum class MovementType { Walking, Jumping, Dying, Boosting }; // Ajout de Boosting
 
     Player();
     virtual ~Player() = default;
@@ -24,10 +23,11 @@ public:
     void setDead(bool dead);
     bool isThrusting() const;
 
-    // --- ENTRÉES DU SPEED BOOST ---
+    // Interface épurée pour le mode Turbo
     void activateSpeedBoost(float distanceInPixels);
-    bool isSpeedBoosting() const { return m_isSpeedBoosting; }
+    bool isSpeedBoosting() const { return m_currentMovement == MovementType::Boosting; }
     static bool isAnyPlayerBoosting() { return s_isSpeedBoosting; }
+    void stopBoost(); // Appelé par BoostState pour restaurer l'état normal du joueur
 
     sf::Sprite& getSprite() { return m_sprite; }
     Exhaust& getExhaust() { return m_exhaust; }
@@ -47,9 +47,5 @@ private:
     const float CEILING_Y = 50.f;
     float m_floorY;
 
-    // Propriétés internes du mode Turbo
-    bool m_isSpeedBoosting;
-    float m_speedBoostTargetX;
-    SpriteAnimator m_speedFlameAnimator;
     static bool s_isSpeedBoosting;
 };

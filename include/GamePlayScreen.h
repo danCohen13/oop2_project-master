@@ -19,7 +19,7 @@ private:
     static constexpr float SCREEN_WIDTH = 1200.0f;
     static constexpr float SCREEN_HEIGHT = 600.0f;
 
-    std::unique_ptr<GameSession> m_session; // CORRECTION : Utilisation d'un unique_ptr pour le Restart
+    std::unique_ptr<GameSession> m_session;
     HUD m_hud;
     BackgroundSystem m_backgroundSystem;
     InputHandler m_inputHandler;
@@ -34,4 +34,8 @@ private:
     std::unique_ptr<Button> m_menuButton;
 
     sf::Vector2f m_mousePos;
+
+    // Gestion du déclenchement du GameOver
+    float m_gameOverTimer;
+    bool m_gameOverScreenPushed;
 };

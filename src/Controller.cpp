@@ -45,7 +45,7 @@ Controller::Controller()
     resources.loadSound("get_power", "resources/getPowerSound.wav");
     resources.loadSound("hit", "resources/hitSound.wav");
     resources.loadSound("missile_launch", "resources/missileLaunch.wav");
-    resources.loadTexture("Speed", "resources/Speed.png");
+    resources.loadTexture("Speed", "resources/SpeedGift.png");
     resources.loadTexture("speedflame", "resources/speedflame.png");
 
     resources.loadTexture("pause_btn", "resources/pause.png");

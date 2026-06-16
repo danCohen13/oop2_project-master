@@ -24,4 +24,5 @@ private:
     int m_score;
     int m_lives;
     float m_gameSpeed;
+    float m_normalGameSpeed;
 };
