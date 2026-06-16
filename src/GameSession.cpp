@@ -1,4 +1,7 @@
 ﻿#include "GameSession.h"
+#include <SFML/Audio.hpp>
+#include "AudioManager.h"
+#include "Resources.h"
 
 GameSession::GameSession()
     : m_score(0), m_lives(1), m_gameSpeed(140.0f)
@@ -8,11 +11,17 @@ GameSession::GameSession()
 void GameSession::update(float deltaTime, bool isThrusting) {
     // 1. GESTION DE LA VITESSE ET DU FREINAGE (FRICTION)
     if (!isGameOver()) {
-        // Si vivant, le jeu accélère normalement
-        if (m_gameSpeed < 900.0f) {
+        if (Player::isAnyPlayerBoosting()) {
+            m_gameSpeed = 1600.0f; // Vitesse fulgurante Hyper-Drive !
+        }
+        else if (m_gameSpeed < 900.0f) {
             m_gameSpeed += 3.5f * deltaTime;
         }
-    }
+        else if (m_gameSpeed > 900.0f) {
+            m_gameSpeed -= 400.0f * deltaTime; // Ralentissement fluide après la fin du boost
+            if (m_gameSpeed < 900.0f) m_gameSpeed = 900.0f;
+        }
+    
     else {
         // Si mort, on freine progressivement le défilement pour un arrêt dramatique
         if (m_gameSpeed > 0.0f) {
@@ -31,6 +40,8 @@ void GameSession::update(float deltaTime, bool isThrusting) {
         int coins = m_board.getCoinsCollectedThisFrame();
         if (coins > 0) {
             addScore(1);
+
+            AudioManager::getInstance().playSound("coin");
         }
 
         // CORRECTION : N'est lu que si le jeu n'est pas déjà considéré en Game Over

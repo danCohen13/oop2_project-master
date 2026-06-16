@@ -106,8 +106,10 @@ void Missile::collide(Object& other) {
 }
 
 void Missile::collide(Player& player) {
-    if (m_status == MissileStatus::Flying && !player.isDead()) {
+    if (player.isSpeedBoosting()) {
+        m_isDisposed = true; // Désintégration immédiate de l'obstacle !
+    }
+    else {
         player.setDead(true);
-        m_isDisposed = true;
     }
 }

@@ -2,6 +2,8 @@
 #include "MenuScreen.h"
 #include "Resources.h"   
 #include "GameplayScreen.h"
+#include "GameException.h"
+#include "AudioManager.h"
 #include <optional>
 
 Controller::Controller()
@@ -22,7 +24,33 @@ Controller::Controller()
     resources.loadTexture("MissileWarning", "resources/MissileWarning.png");
     resources.loadTexture("MissileIncoming", "resources/MissileIncoming.png");
 
+    resources.loadTexture("start_background", "resources/GameMenu.png");
+    resources.loadTexture("background", "resources/Hall.png");
+    resources.loadTexture("start_background", "resources/GameMenu.png");
+    resources.loadTexture("play_btn", "resources/play.png");
+    resources.loadTexture("rules_btn", "resources/rules.png");
+    resources.loadTexture("button_menu", "resources/ButtonMenu.png");
+    resources.loadTexture("background", "resources/Hall.png");
+    resources.loadTexture("help1", "resources/help1.PNG");
+    resources.loadTexture("help2", "resources/help2.PNG");
+    resources.loadTexture("help3", "resources/help3.PNG");
+    resources.loadTexture("back_btn", "resources/back.png");
+    resources.loadTexture("next_btn", "resources/continue.png");
 
+    resources.loadSound("missile_alarm", "resources/MissileAlarm.wav");
+    resources.loadSound("piggy", "resources/Piggy.wav");
+    resources.loadSound("shield_speed", "resources/ShieldSpeed.ogg");
+    resources.loadSound("zapper", "resources/ZapperSound.wav");
+    resources.loadSound("coin", "resources/coin.wav");
+    resources.loadSound("get_power", "resources/getPowerSound.wav");
+    resources.loadSound("hit", "resources/hitSound.wav");
+    resources.loadSound("missile_launch", "resources/missileLaunch.wav");
+    resources.loadTexture("Speed", "resources/Speed.png");
+    resources.loadTexture("speedflame", "resources/speedflame.png");
+
+    resources.loadTexture("pause_btn", "resources/pause.png");
+
+    AudioManager::getInstance().playMusic("resources/JetpackJoyrideMusic.wav", 35.f);
     // 2. ENCHAINEMENT SUR LE PREMIER ÉCRAN
     m_screens.push(std::make_unique<MenuScreen>(m_screens));
 }

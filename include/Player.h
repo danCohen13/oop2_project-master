@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "MovingGameObject.h"
 #include "Exhaust.h"
+#include "SpriteAnimator.h"
 #include <memory>
 
 class PlayerState;
@@ -23,7 +24,11 @@ public:
     void setDead(bool dead);
     bool isThrusting() const;
 
-    // Accès aux composants graphiques pour les états
+    // --- ENTRÉES DU SPEED BOOST ---
+    void activateSpeedBoost(float distanceInPixels);
+    bool isSpeedBoosting() const { return m_isSpeedBoosting; }
+    static bool isAnyPlayerBoosting() { return s_isSpeedBoosting; }
+
     sf::Sprite& getSprite() { return m_sprite; }
     Exhaust& getExhaust() { return m_exhaust; }
 
@@ -32,8 +37,6 @@ private:
     bool  m_isDead;
     bool  m_isThrusting;
 
-    // Exhaust est possédé par Player par composition.
-    // JumpState l'active/désactive et le positionne via getExhaust().
     Exhaust m_exhaust;
 
     std::unique_ptr<PlayerState> m_state;
@@ -43,4 +46,10 @@ private:
     const float JETPACK_FORCE = -600.f;
     const float CEILING_Y = 50.f;
     float m_floorY;
+
+    // Propriétés internes du mode Turbo
+    bool m_isSpeedBoosting;
+    float m_speedBoostTargetX;
+    SpriteAnimator m_speedFlameAnimator;
+    static bool s_isSpeedBoosting;
 };

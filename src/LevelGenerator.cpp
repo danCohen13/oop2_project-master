@@ -23,7 +23,7 @@ void LevelGenerator::generate(float deltaTime,
     // 1. Missiles — flux temporel independant
     spawnMissiles(deltaTime, objects, player, playerX);
 
-    // 2. Coins / Lasers — flux spatial base sur m_nextSpawnX
+    // 2. Coins / Lasers / SpeedItems — flux spatial base sur m_nextSpawnX
     if (m_nextSpawnX == 0.0f)
         m_nextSpawnX = currentSpawnZoneX;
 
@@ -31,13 +31,26 @@ void LevelGenerator::generate(float deltaTime,
         float spawnX = m_nextSpawnX;
         float generationWidth = 0.0f;
 
-        if (rand() % 10 < 6)
+        // Nouvelle répartition : 60% Pièces, 30% Lasers, 10% Turbo Bleu
+        int roll = rand() % 100;
+        if (roll < 60) {
             // 60% — formation de pieces (switch delegue a CoinFormation)
             generationWidth = CoinFormation::createRandom(
                 objects, spawnX, CEILING_LIMIT, FLOOR_LIMIT, COIN_SPACING);
-        else
-            // 40% — laser
+        }
+        else if (roll < 90) {
+            // 30% — laser
             generationWidth = spawnLaser(objects, spawnX);
+        }
+        else {
+            // 10% — SpeedItem (Item de vitesse bleu)
+            // Calcul d'une hauteur flottante aléatoire sûre entre le plafond et le sol
+            float itemY = CEILING_LIMIT + 100.0f + static_cast<float>(rand() % static_cast<int>(FLOOR_LIMIT - CEILING_LIMIT - 200.0f));
+
+            // Instanciation via la Factory
+            objects.push_back(GameObjectFactory::createObject("SpeedItem", { spawnX + 200.0f, itemY }));
+            generationWidth = 300.0f; // Largeur de sécurité sur la grille
+        }
 
         float separationPadding = 500.0f + static_cast<float>(rand() % 600);
         m_nextSpawnX = spawnX + generationWidth + separationPadding;
