@@ -6,6 +6,8 @@
 #include "Coin.h"
 #include "Laser.h" 
 #include "SpeedItem.h"
+#include "Scientist.h"
+
 
 Board::Board()
     : m_player(std::make_unique<Player>()),
@@ -18,6 +20,7 @@ Board::Board()
     GameObjectFactory::registerType<Coin>("Coin");
     GameObjectFactory::registerType<Laser>("Laser");
     GameObjectFactory::registerType<SpeedItem>("SpeedItem");
+    GameObjectFactory::registerType<Scientist>("Scientist"); // <-- AJOUT
 }
 
 Board::~Board() = default;

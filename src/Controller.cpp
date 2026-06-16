@@ -30,7 +30,7 @@ Controller::Controller()
     resources.loadTexture("play_btn", "resources/play.png");
     resources.loadTexture("rules_btn", "resources/rules.png");
     resources.loadTexture("button_menu", "resources/ButtonMenu.png");
-    resources.loadTexture("background", "resources/Hall.png");
+    resources.loadTexture("Title", "resources/Title.png");
     resources.loadTexture("help1", "resources/help1.PNG");
     resources.loadTexture("help2", "resources/help2.PNG");
     resources.loadTexture("help3", "resources/help3.PNG");
@@ -38,6 +38,7 @@ Controller::Controller()
     resources.loadTexture("next_btn", "resources/continue.png");
 
     resources.loadSound("missile_alarm", "resources/MissileAlarm.wav");
+    resources.loadTexture("Scientist", "resources/Scientist.png"); // <-- AJOUT
     resources.loadSound("piggy", "resources/Piggy.wav");
     resources.loadSound("shield_speed", "resources/ShieldSpeed.ogg");
     resources.loadSound("zapper", "resources/ZapperSound.wav");

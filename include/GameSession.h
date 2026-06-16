@@ -15,7 +15,6 @@ public:
     sf::Vector2f getPlayerPosition() const;
     int getDistanceInMeters() const;
 
-    // Fonctions pour manipuler les données depuis le Board ou CollisionManager plus tard
     void addScore(int points);
     void removeLife();
 
@@ -25,4 +24,7 @@ private:
     int m_lives;
     float m_gameSpeed;
     float m_normalGameSpeed;
+
+    // Timer pour prolonger l'invincibilité après le retour à la vitesse normale
+    float m_boostCooldownTimer;
 };

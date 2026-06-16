@@ -6,14 +6,12 @@
 #include "BoostState.h" 
 #include "AudioManager.h"
 
-// Déclaration unique de la variable statique globale
-bool Player::s_isSpeedBoosting = false;
-
 Player::Player()
     : MovingGameObject(Resources::getInstance().getTexture("player"), 300.0f),
     m_verticalVelocity(0.0f),
     m_isDead(false),
     m_isThrusting(false),
+    m_isInvincible(false), // Par défaut, le joueur peut mourir
     m_state(std::make_unique<WalkState>()),
     m_currentMovement(MovementType::Walking),
     m_floorY(550.0f)
@@ -29,7 +27,6 @@ Player::Player()
 }
 
 void Player::update(float deltaTime, bool isThrusting) {
-    // Gestion de la transition vers l'état de mort (uniquement hors mode Boost)
     if (m_isDead && m_currentMovement != MovementType::Dying && m_currentMovement != MovementType::Boosting) {
         m_state = std::make_unique<DeadState>();
         m_currentMovement = MovementType::Dying;
@@ -37,7 +34,7 @@ void Player::update(float deltaTime, bool isThrusting) {
         AudioManager::getInstance().playSound("hit");
     }
 
-    // 1. CALCULS PHYSIQUES COMPLETS
+    // 1. CALCULS PHYSIQUES
     if (m_currentMovement == MovementType::Dying) {
         m_verticalVelocity += GRAVITY * deltaTime;
     }
@@ -61,7 +58,7 @@ void Player::update(float deltaTime, bool isThrusting) {
         if (m_currentMovement != MovementType::Dying) m_verticalVelocity = 0.0f;
     }
 
-    // 2. GESTION DES TRANSITIONS DE MOUVEMENT STANDARDS (Si vivant et hors Boost)
+    // 2. GESTION DES TRANSITIONS DE MOUVEMENT STANDARDS
     if (m_currentMovement != MovementType::Dying && m_currentMovement != MovementType::Boosting) {
         bool isOnGround = (m_sprite.getPosition().y >= m_floorY);
 
@@ -75,7 +72,6 @@ void Player::update(float deltaTime, bool isThrusting) {
         }
     }
 
-    // 3. DÉLÉGATION Polymorphique au State courant
     m_state->update(*this, deltaTime);
 }
 
@@ -86,19 +82,16 @@ void Player::draw(sf::RenderWindow& window) const {
 void Player::activateSpeedBoost(float distanceInPixels) {
     if (m_currentMovement == MovementType::Dying) return;
 
-    s_isSpeedBoosting = true;
     m_currentMovement = MovementType::Boosting;
-
-    // On bascule l'état interne sur le nouveau BoostState indépendant
+    m_isInvincible = true; // Rendu immédiatement invincible
     m_state = std::make_unique<BoostState>(m_sprite.getPosition().x, distanceInPixels);
 
     AudioManager::getInstance().playSound("shield_speed");
 }
 
 void Player::stopBoost() {
-    s_isSpeedBoosting = false;
-
-    // Restauration de l'état physique approprié à la sortie du mode Turbo
+    // À la fin de l'état graphique du boost, l'invincibilité reste à true.
+    // C'est maintenant la GameSession qui décidera quand la couper !
     bool isOnGround = (m_sprite.getPosition().y >= m_floorY);
     if (isOnGround) {
         m_state = std::make_unique<WalkState>();
@@ -111,22 +104,10 @@ void Player::stopBoost() {
 }
 
 void Player::setDead(bool dead) {
-    if (m_currentMovement == MovementType::Boosting) return; // Invincible pendant le boost
+    if (m_isInvincible) return; // Protection absolue active
     m_isDead = dead;
 }
 
-// ============================================================================
-// CORRECTION DES RESOLUTIONS LINKER LNK2019 : RE-RESTAURATION DES REQUÊTES PURES
-// ============================================================================
-
-void Player::collide(Object& other) {
-    other.collide(*this);
-}
-
-bool Player::isDead() const {
-    return m_isDead;
-}
-
-bool Player::isThrusting() const {
-    return m_isThrusting;
-}
+void Player::collide(Object& other) { other.collide(*this); }
+bool Player::isDead() const { return m_isDead; }
+bool Player::isThrusting() const { return m_isThrusting; }

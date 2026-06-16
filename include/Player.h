@@ -7,7 +7,7 @@ class PlayerState;
 
 class Player : public MovingGameObject {
 public:
-    enum class MovementType { Walking, Jumping, Dying, Boosting }; // Ajout de Boosting
+    enum class MovementType { Walking, Jumping, Dying, Boosting };
 
     Player();
     virtual ~Player() = default;
@@ -23,11 +23,14 @@ public:
     void setDead(bool dead);
     bool isThrusting() const;
 
-    // Interface épurée pour le mode Turbo
+    // Interface épurée du Boost
     void activateSpeedBoost(float distanceInPixels);
     bool isSpeedBoosting() const { return m_currentMovement == MovementType::Boosting; }
-    static bool isAnyPlayerBoosting() { return s_isSpeedBoosting; }
-    void stopBoost(); // Appelé par BoostState pour restaurer l'état normal du joueur
+    void stopBoost();
+
+    // Contrôle d'invincibilité externe
+    void setInvincible(bool invincible) { m_isInvincible = invincible; }
+    bool isInvincible() const { return m_isInvincible; }
 
     sf::Sprite& getSprite() { return m_sprite; }
     Exhaust& getExhaust() { return m_exhaust; }
@@ -36,6 +39,7 @@ private:
     float m_verticalVelocity;
     bool  m_isDead;
     bool  m_isThrusting;
+    bool  m_isInvincible; // Nouveau flag de protection
 
     Exhaust m_exhaust;
 
@@ -46,6 +50,4 @@ private:
     const float JETPACK_FORCE = -600.f;
     const float CEILING_Y = 50.f;
     float m_floorY;
-
-    static bool s_isSpeedBoosting;
 };

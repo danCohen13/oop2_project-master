@@ -23,6 +23,7 @@ public:
 
     bool isPlayerAlive() const;
     sf::Vector2f getPlayerPosition() const;
+    Player* getPlayer() const { return m_player.get(); }
 
     // Getters d'événements pour la GameSession
     int getCoinsCollectedThisFrame() const;

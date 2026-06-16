@@ -1,53 +1,69 @@
 ﻿#include "GameSession.h"
+#include <SFML/Audio.hpp>
+#include "AudioManager.h"
+#include "Resources.h"
 #include "Player.h"
 
 GameSession::GameSession()
-    : m_score(0), m_lives(1), m_gameSpeed(140.0f), m_normalGameSpeed(140.0f)
+    : m_score(0), m_lives(1), m_gameSpeed(140.0f), m_normalGameSpeed(140.0f), m_boostCooldownTimer(0.0f)
 {
 }
 
 void GameSession::update(float deltaTime, bool isThrusting) {
+    Player* player = m_board.getPlayer(); // On récupère l'instance du joueur pour ajuster son invincibilité
+
     // 1. GESTION DE LA VITESSE ET DU FREINAGE (FRICTION)
     if (!isGameOver()) {
-        // La vitesse normale progresse toujours en arrière-plan
         if (m_normalGameSpeed < 900.0f) {
             m_normalGameSpeed += 3.5f * deltaTime;
         }
 
-        if (Player::isAnyPlayerBoosting()) {
-            m_gameSpeed = 1600.0f; // Vitesse fulgurante Hyper-Drive !
+        if (player && player->isSpeedBoosting()) {
+            m_gameSpeed = 1600.0f;
+            m_boostCooldownTimer = 2.5f; // On arme le timer à 2.5 secondes de sécurité
+            player->setInvincible(true);  // Sécurité redondante
         }
         else {
-            // CORRECTION : Retour à la normale fluide après la fin du boost
             if (m_gameSpeed > m_normalGameSpeed) {
                 m_gameSpeed -= 600.0f * deltaTime; // Décélération progressive
                 if (m_gameSpeed < m_normalGameSpeed) {
                     m_gameSpeed = m_normalGameSpeed;
                 }
+                if (player) player->setInvincible(true); // Toujours invincible pendant l'entre-deux !
             }
             else {
                 m_gameSpeed = m_normalGameSpeed;
+
+                // On est enfin revenu à la vitesse normale ! Le cooldown de 2.5s commence à expirer
+                if (m_boostCooldownTimer > 0.0f) {
+                    m_boostCooldownTimer -= deltaTime;
+                    if (player) player->setInvincible(true); // Reste protégé pendant les 2-3 secondes
+                }
+                else {
+                    // Le délai est totalement écoulé, le joueur redevient mortel de manière sécurisée
+                    if (player && player->isInvincible()) {
+                        player->setInvincible(false);
+                    }
+                }
             }
         }
     }
     else {
-        // Si mort, on freine progressivement le défilement pour un arrêt dramatique
         if (m_gameSpeed > 0.0f) {
             m_gameSpeed -= 120.0f * deltaTime;
-            if (m_gameSpeed < 0.0f) {
-                m_gameSpeed = 0.0f;
-            }
+            if (m_gameSpeed < 0.0f) m_gameSpeed = 0.0f;
         }
     }
 
     // 2. Mise à jour physique du monde
     m_board.play(deltaTime, m_gameSpeed, isThrusting);
 
-    // 3. RÈGLES DE JEU (Uniquement si la partie est encore active !)
+    // 3. RÈGLES DE JEU
     if (!isGameOver()) {
         int coins = m_board.getCoinsCollectedThisFrame();
         if (coins > 0) {
             addScore(1);
+            AudioManager::getInstance().playSound("coin");
         }
 
         if (m_board.hasPlayerHitHazard()) {

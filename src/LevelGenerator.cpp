@@ -31,25 +31,27 @@ void LevelGenerator::generate(float deltaTime,
         float spawnX = m_nextSpawnX;
         float generationWidth = 0.0f;
 
-        // Nouvelle répartition : 60% Pièces, 30% Lasers, 10% Turbo Bleu
         int roll = rand() % 100;
         if (roll < 60) {
-            // 60% — formation de pieces (switch delegue a CoinFormation)
             generationWidth = CoinFormation::createRandom(
                 objects, spawnX, CEILING_LIMIT, FLOOR_LIMIT, COIN_SPACING);
         }
         else if (roll < 90) {
-            // 30% — laser
             generationWidth = spawnLaser(objects, spawnX);
         }
         else {
-            // 10% — SpeedItem (Item de vitesse bleu)
-            // Calcul d'une hauteur flottante aléatoire sûre entre le plafond et le sol
             float itemY = CEILING_LIMIT + 100.0f + static_cast<float>(rand() % static_cast<int>(FLOOR_LIMIT - CEILING_LIMIT - 200.0f));
-
-            // Instanciation via la Factory
             objects.push_back(GameObjectFactory::createObject("SpeedItem", { spawnX + 200.0f, itemY }));
-            generationWidth = 300.0f; // Largeur de sécurité sur la grille
+            generationWidth = 300.0f;
+        }
+
+        // --- AJOUT : GÉNÉRATION ALÉATOIRE DE SCIENTIFIQUES AU SOL ---
+        if (rand() % 10 < 4) { // 40% de chance d'apparition par section de carte
+            // Position X aléatoire dans la section courante
+            float scientistX = spawnX + static_cast<float>(rand() % 500);
+
+            // Placé directement sur FLOOR_LIMIT (l'origine s'occupe de le caler vers le haut)
+            objects.push_back(GameObjectFactory::createObject("Scientist", { scientistX, FLOOR_LIMIT }));
         }
 
         float separationPadding = 500.0f + static_cast<float>(rand() % 600);
@@ -61,20 +63,16 @@ void LevelGenerator::spawnMissiles(float deltaTime,
     std::vector<std::unique_ptr<Object>>& objects,
     Player& player, float playerX)
 {
-    // Zone de securite au debut : pas de missiles avant 15 000px
     if (player.isDead() || playerX <= DISTANCE_SECURITE_DEBUT) return;
 
     m_missileTimer += deltaTime;
     if (m_missileTimer < m_nextMissileDelay) return;
 
-    // Reinitialisation du timer
     m_missileTimer = 0.0f;
 
-    // Difficulte croissante : delai minimum diminue avec la distance
     float delaiMin = std::max(2.5f, 7.0f - (playerX / 20000.0f));
     m_nextMissileDelay = delaiMin + static_cast<float>(rand() % 4);
 
-    // Taille de la salve : +1 missile tous les 10 000px, plafond a 3
     int salve = std::min(
         1 + static_cast<int>((playerX - DISTANCE_SECURITE_DEBUT) / 10000.0f),
         3
@@ -97,7 +95,6 @@ void LevelGenerator::spawnMissiles(float deltaTime,
 float LevelGenerator::spawnLaser(std::vector<std::unique_ptr<Object>>& objects,
     float spawnX)
 {
-    // Laser place aleatoirement en haut ou en bas de l'ecran
     float laserY = (rand() % 2 == 0)
         ? CEILING_LIMIT + LASER_RADIUS
         : FLOOR_LIMIT - LASER_RADIUS;
