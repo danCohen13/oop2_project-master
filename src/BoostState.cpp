@@ -5,7 +5,7 @@
 BoostState::BoostState(float currentX, float distanceInPixels)
     : m_targetX(currentX + distanceInPixels),
     // RE-DÉFINITION DU SPRITESHEET : Renseigne ici le nombre EXACT de frames horizontales de ta flamme bleue (ex: 4, 5 ou 6).
-    m_speedFlameAnimator(Resources::getInstance().getTexture("speedflame"), 4, 0.05f)
+    m_speedFlameAnimator(Resources::getInstance().getTexture("speedflame"), 3, 0.05f)
 {
 }
 
@@ -15,7 +15,7 @@ void BoostState::update(Player& player, float deltaTime) {
         player.stopBoost();
     }
     else {
-        player.getSprite().setRotation(sf::degrees(15.f)); // Inclinaison aérodynamique
+        player.getSprite().setRotation(sf::degrees(20.f)); // Inclinaison aérodynamique
         m_speedFlameAnimator.update(deltaTime);
     }
 }

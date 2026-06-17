@@ -7,7 +7,8 @@ class PlayerState;
 
 class Player : public MovingGameObject {
 public:
-    enum class MovementType { Walking, Jumping, Dying, Boosting };
+    // Ajout de SuperPowerRunner dans l'énumération
+    enum class MovementType { Walking, Jumping, Dying, Boosting, SuperPowerRunner };
 
     Player();
     virtual ~Player() = default;
@@ -32,6 +33,14 @@ public:
     void setInvincible(bool invincible) { m_isInvincible = invincible; }
     bool isInvincible() const { return m_isInvincible; }
 
+    // Pouvoir SuperPowerRunner
+    void activateSuperPowerRunner();
+    bool isSuperPowerRunner() const { return m_currentMovement == MovementType::SuperPowerRunner; }
+
+    // CORRECTION : Accesseurs requis pour les calculs physiques de l'état
+    float getFloorY() const { return m_floorY; }
+    float getCeilingY() const { return CEILING_Y; }
+
     sf::Sprite& getSprite() { return m_sprite; }
     Exhaust& getExhaust() { return m_exhaust; }
 
@@ -39,7 +48,7 @@ private:
     float m_verticalVelocity;
     bool  m_isDead;
     bool  m_isThrusting;
-    bool  m_isInvincible; // Nouveau flag de protection
+    bool  m_isInvincible;
 
     Exhaust m_exhaust;
 

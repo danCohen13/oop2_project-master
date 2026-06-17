@@ -109,7 +109,12 @@ void Missile::collide(Player& player) {
     if (player.isSpeedBoosting()) {
         m_isDisposed = true; // Désintégration immédiate de l'obstacle !
     }
+    // AJOUT : Si le missile touche le costume de gravité, le missile s'autodétruit
+    else if (player.isSuperPowerRunner()) {
+        m_isDisposed = true;
+        player.setDead(true); // Le joueur perd son costume mais survit
+    }
     else {
-        player.setDead(true);
+        player.setDead(true); // Mort normale
     }
 }

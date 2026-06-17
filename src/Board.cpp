@@ -7,6 +7,8 @@
 #include "Laser.h" 
 #include "SpeedItem.h"
 #include "Scientist.h"
+#include "PowerUpBox.h"
+
 
 
 Board::Board()
@@ -20,7 +22,8 @@ Board::Board()
     GameObjectFactory::registerType<Coin>("Coin");
     GameObjectFactory::registerType<Laser>("Laser");
     GameObjectFactory::registerType<SpeedItem>("SpeedItem");
-    GameObjectFactory::registerType<Scientist>("Scientist"); // <-- AJOUT
+    GameObjectFactory::registerType<Scientist>("Scientist"); 
+    GameObjectFactory::registerType<PowerUpBox>("PowerUpBox");
 }
 
 Board::~Board() = default;

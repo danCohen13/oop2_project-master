@@ -95,8 +95,13 @@ void Laser::collide(Player& player) {
         }
     }
 
-    if (realCollision)
-        player.setDead(true);
+    if (realCollision) {
+        // Si le joueur a le pouvoir de gravité, le laser explose/disparaît à l'impact
+        if (player.isSuperPowerRunner()) {
+            m_isDisposed = true;
+        }
+        player.setDead(true); // Déclenche le retrait du pouvoir géré par Player::setDead
+    }
 }
 
 bool Laser::isDisposed() const {

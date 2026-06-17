@@ -5,16 +5,26 @@
 WalkState::WalkState() : m_currentFrame(0), m_frameTimer(0.0f) {}
 
 void WalkState::update(Player& player, float deltaTime) {
+    auto& sprite = player.getSprite();
+    const sf::Texture& normalTex = Resources::getInstance().getTexture("player");
+
+    // CORRECTION SFML 3.0 : Utilisation de '&' pour valider la comparaison d'adresses
+    if (&sprite.getTexture() != &normalTex) {
+        sprite.setTexture(normalTex, false);
+        sprite.setScale({ 1.f, 1.f });        // Remet à l'endroit
+        sprite.setRotation(sf::degrees(0.f)); // Remise droite (SFML 3.0)
+        sprite.setOrigin({ 0.f, 0.f });       // FIX ANCRAGE EXHAUST : Repère en haut à gauche
+    }
+
     m_frameTimer += deltaTime;
     if (m_frameTimer >= FRAME_DURATION) {
         m_frameTimer = 0.0f;
         m_currentFrame = (m_currentFrame + 1) % 4; // Boucle sur les 4 frames de course
 
-        const sf::Texture& playerTex = Resources::getInstance().getTexture("player");
-        int playerWidth = playerTex.getSize().x / 4;
-        int playerHeight = playerTex.getSize().y;
+        int playerWidth = normalTex.getSize().x / 4;
+        int playerHeight = normalTex.getSize().y;
 
-        player.getSprite().setTextureRect(sf::IntRect({ m_currentFrame * playerWidth, 0 }, { playerWidth, playerHeight }));
+        sprite.setTextureRect(sf::IntRect({ static_cast<int>(m_currentFrame * playerWidth), 0 }, { playerWidth, playerHeight }));
     }
 }
 

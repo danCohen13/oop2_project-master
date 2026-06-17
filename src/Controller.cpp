@@ -49,6 +49,9 @@ Controller::Controller()
     resources.loadTexture("Speed", "resources/SpeedGift.png");
     resources.loadTexture("speedflame", "resources/speedflame.png");
 
+    Resources::getInstance().loadTexture("PowerUpBox", "resources/PowerUpBox.png");
+    Resources::getInstance().loadTexture("SuperPowerRunner", "resources/SuperPowerRunner.png");
+
     resources.loadTexture("pause_btn", "resources/pause.png");
 
     AudioManager::getInstance().playMusic("resources/JetpackJoyrideMusic.wav", 35.f);
