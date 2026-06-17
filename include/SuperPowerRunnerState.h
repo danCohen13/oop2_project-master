@@ -7,16 +7,18 @@ public:
     SuperPowerRunnerState(Player& player);
     virtual ~SuperPowerRunnerState() override = default;
 
-    virtual void update(Player& player, float deltaTime) override;
-    virtual void draw(sf::RenderWindow& window,
+    void update(Player& player, float deltaTime) override;
+    void draw(sf::RenderWindow& window,
         const sf::Sprite& playerSprite,
         const Exhaust& exhaust) const override;
 
-private:
-    SpriteAnimator m_animator;
-    bool m_gravityReversed;
-    bool m_spaceWasPressed;
-    float m_verticalVelocity;
+    bool isSuperPowerRunner() const override { return true; }
+    bool isInvincible()       const override { return true; }
 
-    const float GRAVITY_ACCEL = 3500.f; // Gravité plus lourde pour un effet nerveux et agréable
+    void handleHit(Player& player) override;
+
+private:
+    bool m_gravityInverted;
+    bool m_lastThrustingState;
+    SpriteAnimator m_animator;
 };

@@ -7,11 +7,8 @@ class PlayerState;
 
 class Player : public MovingGameObject {
 public:
-    // Ajout de SuperPowerRunner dans l'énumération
-    enum class MovementType { Walking, Jumping, Dying, Boosting, SuperPowerRunner };
-
     Player();
-    virtual ~Player() = default;
+    virtual ~Player() override = default;
 
     void update(float deltaTime, bool isThrusting);
     virtual void update(float deltaTime) override { update(deltaTime, false); }
@@ -20,40 +17,45 @@ public:
     virtual void collide(Object& other) override;
     virtual void collide(Player&) override {}
 
-    bool isDead()      const;
+    // Requêtes d'état transmises polymorphiquement
+    bool isDead() const;
     void setDead(bool dead);
     bool isThrusting() const;
+    bool isSpeedBoosting() const;
+    bool isSuperPowerRunner() const;
 
-    // Interface épurée du Boost
-    void activateSpeedBoost(float distanceInPixels);
-    bool isSpeedBoosting() const { return m_currentMovement == MovementType::Boosting; }
-    void stopBoost();
-
-    // Contrôle d'invincibilité externe
+    // Invincibilité externe requise par GameSession
     void setInvincible(bool invincible) { m_isInvincible = invincible; }
-    bool isInvincible() const { return m_isInvincible; }
+    bool isInvincible() const;
 
-    // Pouvoir SuperPowerRunner
+    // Gestionnaire des transitions d'état
+    void changeState(std::unique_ptr<PlayerState> newState);
+
+    // Actions de déclenchement des bonus
+    void activateSpeedBoost(float distanceInPixels);
+    void stopBoost();
     void activateSuperPowerRunner();
-    bool isSuperPowerRunner() const { return m_currentMovement == MovementType::SuperPowerRunner; }
 
-    // CORRECTION : Accesseurs requis pour les calculs physiques de l'état
+    // Physique standard partagée
+    void applyStandardPhysics(float deltaTime, bool useJetpack);
+
+    // Accesseurs
     float getFloorY() const { return m_floorY; }
     float getCeilingY() const { return CEILING_Y; }
+    float getVerticalVelocity() const { return m_verticalVelocity; }
+    void setVerticalVelocity(float velocity) { m_verticalVelocity = velocity; }
 
     sf::Sprite& getSprite() { return m_sprite; }
+    const sf::Sprite& getSprite() const { return m_sprite; }
     Exhaust& getExhaust() { return m_exhaust; }
 
 private:
     float m_verticalVelocity;
-    bool  m_isDead;
     bool  m_isThrusting;
     bool  m_isInvincible;
 
     Exhaust m_exhaust;
-
     std::unique_ptr<PlayerState> m_state;
-    MovementType m_currentMovement;
 
     const float GRAVITY = 980.f;
     const float JETPACK_FORCE = -600.f;

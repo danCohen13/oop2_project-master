@@ -8,13 +8,14 @@ public:
     virtual ~BoostState() override = default;
 
     virtual void update(Player& player, float deltaTime) override;
-
-    // CORRECTION SIGNATURE CONST : Correspondance exacte et stricte avec l'interface PlayerState.h
     virtual void draw(sf::RenderWindow& window,
         const sf::Sprite& playerSprite,
         const Exhaust& exhaust) const override;
 
+    virtual bool isInvincible()   const override { return true; }
+    virtual bool isSpeedBoosting() const override { return true; }
+
 private:
     float m_targetX;
-    mutable SpriteAnimator m_speedFlameAnimator;
+    SpriteAnimator m_speedFlameAnimator;
 };

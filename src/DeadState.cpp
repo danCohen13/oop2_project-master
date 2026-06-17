@@ -5,43 +5,53 @@
 DeadState::DeadState()
     : m_animator(
         Resources::getInstance().getTexture("PlayerDead"),
-        // Déduction automatique du nombre de frames (Largeur / Hauteur)
         static_cast<int>(Resources::getInstance().getTexture("PlayerDead").getSize().x /
             Resources::getInstance().getTexture("PlayerDead").getSize().y),
-        0.07f // Vitesse de la roulade au sol
-    )
+        0.07f
+    ),
+    m_finished(false),
+    m_started(false)
 {
 }
 
 void DeadState::update(Player& player, float deltaTime) {
-    player.getSprite().setTexture(Resources::getInstance().getTexture("PlayerDead"));
+    // Appliquer la physique de chute pour que le corps tombe naturellement au sol
+    player.applyStandardPhysics(deltaTime, false);
 
-    if (!m_finished) {
-        bool frameChanged = m_animator.update(deltaTime);
-        m_animator.applyTo(player.getSprite());
+    auto& sprite = player.getSprite();
+    const sf::Texture& deadTex = Resources::getInstance().getTexture("PlayerDead");
 
-        if (frameChanged) {
-            m_started = true; // au moins un changement de frame a eu lieu
-        }
+    if (&sprite.getTexture() != &deadTex) {
+        sprite.setTexture(deadTex, false);
 
-        // On détecte le wrap-around SEULEMENT après avoir démarré
-        if (m_started && m_animator.getCurrentFrame() == 0) {
-            m_finished = true;
-            // Forcer manuellement la DERNIÈRE frame (frame 4 sur 5)
-            const sf::Texture& tex = Resources::getInstance().getTexture("PlayerDead");
-            int totalFrames = static_cast<int>(tex.getSize().x / tex.getSize().y);
-            int fw = tex.getSize().x / totalFrames;
-            int fh = tex.getSize().y;
-            player.getSprite().setTextureRect(
-                sf::IntRect({ (totalFrames - 1) * fw, 0 }, { fw, fh })
-            );
-        }
+        int totalFrames = static_cast<int>(deadTex.getSize().x / deadTex.getSize().y);
+        int fw = static_cast<int>(deadTex.getSize().x) / totalFrames;
+        int fh = static_cast<int>(deadTex.getSize().y);
+        sprite.setTextureRect(sf::IntRect({ 0, 0 }, { fw, fh }));
     }
 
     player.getExhaust().setActive(false);
+
+    if (!m_finished) {
+        bool frameChanged = m_animator.update(deltaTime);
+        m_animator.applyTo(sprite);
+
+        if (frameChanged) {
+            m_started = true;
+        }
+
+        if (m_started && m_animator.getCurrentFrame() == 0) {
+            m_finished = true;
+
+            int totalFrames = static_cast<int>(deadTex.getSize().x / deadTex.getSize().y);
+            int fw = static_cast<int>(deadTex.getSize().x) / totalFrames;
+            int fh = static_cast<int>(deadTex.getSize().y);
+
+            sprite.setTextureRect(sf::IntRect({ (totalFrames - 1) * fw, 0 }, { fw, fh }));
+        }
+    }
 }
 
-void DeadState::draw(sf::RenderWindow& window, const sf::Sprite& playerSprite, const Exhaust& exhaust) const {
-    (void)exhaust; // On ignore l'exhaust car le jetpack est éteint à la mort
+void DeadState::draw(sf::RenderWindow& window, const sf::Sprite& playerSprite, const Exhaust&) const {
     window.draw(playerSprite);
 }

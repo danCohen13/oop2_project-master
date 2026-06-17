@@ -1,11 +1,11 @@
 ﻿#pragma once
 #include "PlayerState.h"
-#include "SpriteAnimator.h" // Intégration de l'animateur par composition
+#include "SpriteAnimator.h"
 
 class DeadState : public PlayerState {
 public:
     DeadState();
-    virtual ~DeadState() = default;
+    virtual ~DeadState() override = default;
 
     void update(Player& player, float deltaTime) override;
 
@@ -13,8 +13,10 @@ public:
         const sf::Sprite& playerSprite,
         const Exhaust& exhaust) const override;
 
+    virtual bool isDead() const override { return true; }
+
 private:
-    SpriteAnimator m_animator; // L'état possède son propre animateur de mort
-    bool m_finished = false;
-    bool m_started = false;
+    SpriteAnimator m_animator;
+    bool m_finished;
+    bool m_started;
 };

@@ -1,23 +1,35 @@
 ﻿#include "JumpState.h"
 #include "Player.h"
+#include "WalkState.h" // <-- REQUIS pour la transition changeState vers WalkState
 #include "Resources.h"
-#include "Exhaust.h"
 
-JumpState::JumpState() : m_currentFrame(0), m_frameTimer(0.0f) {}
+JumpState::JumpState() {}
 
 void JumpState::update(Player& player, float deltaTime) {
-    // 1. Découpage du joueur sur sa frame en l'air (Dernière frame)
-    const sf::Texture& playerTex = Resources::getInstance().getTexture("player");
-    int playerWidth = playerTex.getSize().x / 4;
-    int playerHeight = playerTex.getSize().y;
-    player.getSprite().setTextureRect(sf::IntRect({ 3 * playerWidth, 0 }, { playerWidth, playerHeight }));
+    // 1. Application de la physique de saut (gravité + impulsion jetpack)
+    player.applyStandardPhysics(deltaTime, true);
 
-    // 2. On délègue TOUT le travail à l'objet Exhaust encapsulé dans Player
+    // 2. Transition de retour au sol autonome
+    if (player.getSprite().getPosition().y >= player.getFloorY()) {
+        player.changeState(std::make_unique<WalkState>());
+        return;
+    }
+
+    // 3. Cadre fixe (règle du dépôt) : Verrouiller les jambes sur la frame de vol (index 3)
+    auto& sprite = player.getSprite();
+    const sf::Texture& playerTex = Resources::getInstance().getTexture("player");
+    int playerWidth = static_cast<int>(playerTex.getSize().x) / 4;
+    int playerHeight = static_cast<int>(playerTex.getSize().y);
+    sprite.setTextureRect(sf::IntRect({ 3 * playerWidth, 0 }, { playerWidth, playerHeight }));
+
+    // 4. Synchronisation de la flamme uniquement si l'impulsion est active
     player.getExhaust().setActive(player.isThrusting());
-    player.getExhaust().update(deltaTime, player.getPosition());
+    if (player.isThrusting()) {
+        player.getExhaust().syncFrame(3);
+    }
 }
 
 void JumpState::draw(sf::RenderWindow& window, const sf::Sprite& playerSprite, const Exhaust& exhaust) const {
-    exhaust.draw(window);      // Dessine la flamme en premier (arrière-plan)
-    window.draw(playerSprite); // Dessine le joueur par-dessus
+    exhaust.draw(window);
+    window.draw(playerSprite);
 }

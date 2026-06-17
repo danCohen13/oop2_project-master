@@ -1,19 +1,17 @@
 #pragma once
 #include "PlayerState.h"
-
-class Exhaust;
+#include "SpriteAnimator.h"
 
 class WalkState : public PlayerState {
 public:
     WalkState();
-    void update(Player& player, float deltaTime) override;
+    virtual ~WalkState() override = default;
 
-    void draw(sf::RenderWindow& window,
+    virtual void update(Player& player, float deltaTime) override;
+    virtual void draw(sf::RenderWindow& window,
         const sf::Sprite& playerSprite,
-        const Exhaust& exhaust) const override; // <-- Correspondance exacte
+        const Exhaust& exhaust) const override;
 
 private:
-    int m_currentFrame;
-    float m_frameTimer;
-    const float FRAME_DURATION = 0.1f;
+    SpriteAnimator m_animator;
 };
