@@ -5,8 +5,9 @@
 DeadState::DeadState()
     : m_animator(
         Resources::getInstance().getTexture("PlayerDead"),
-        static_cast<int>(Resources::getInstance().getTexture("PlayerDead").getSize().x /
-            Resources::getInstance().getTexture("PlayerDead").getSize().y),
+        // SFML FIX : Conversion native Vector2u -> Vector2i d'un coup (largeur / hauteur)
+        sf::Vector2i(Resources::getInstance().getTexture("PlayerDead").getSize()).x /
+        sf::Vector2i(Resources::getInstance().getTexture("PlayerDead").getSize()).y,
         0.07f
     ),
     m_finished(false),
@@ -24,10 +25,10 @@ void DeadState::update(Player& player, float deltaTime) {
     if (&sprite.getTexture() != &deadTex) {
         sprite.setTexture(deadTex, false);
 
-        int totalFrames = static_cast<int>(deadTex.getSize().x / deadTex.getSize().y);
-        int fw = static_cast<int>(deadTex.getSize().x) / totalFrames;
-        int fh = static_cast<int>(deadTex.getSize().y);
-        sprite.setTextureRect(sf::IntRect({ 0, 0 }, { fw, fh }));
+        // OPTIMISATION : Plus besoin de recalculer la taille manuellement, 
+        // l'animateur l'a déjà stockée au format sf::Vector2i !
+        sf::Vector2i frameSize = m_animator.getFrameSize();
+        sprite.setTextureRect(sf::IntRect({ 0, 0 }, frameSize));
     }
 
     player.getExhaust().setActive(false);
@@ -43,11 +44,13 @@ void DeadState::update(Player& player, float deltaTime) {
         if (m_started && m_animator.getCurrentFrame() == 0) {
             m_finished = true;
 
-            int totalFrames = static_cast<int>(deadTex.getSize().x / deadTex.getSize().y);
-            int fw = static_cast<int>(deadTex.getSize().x) / totalFrames;
-            int fh = static_cast<int>(deadTex.getSize().y);
+            // Utilisation des propriétés natives de conversion de SFML et de l'animateur
+            sf::Vector2i texSize(deadTex.getSize());
+            sf::Vector2i frameSize = m_animator.getFrameSize();
+            int totalFrames = texSize.x / frameSize.x; // Division d'entiers pure
 
-            sprite.setTextureRect(sf::IntRect({ (totalFrames - 1) * fw, 0 }, { fw, fh }));
+            // Configuration propre de la dernière frame sans aucun cast
+            sprite.setTextureRect(sf::IntRect({ (totalFrames - 1) * frameSize.x, 0 }, frameSize));
         }
     }
 }

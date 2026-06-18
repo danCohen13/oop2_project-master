@@ -24,9 +24,6 @@ Controller::Controller()
     resources.loadTexture("MissileWarning", "resources/MissileWarning.png");
     resources.loadTexture("MissileIncoming", "resources/MissileIncoming.png");
 
-    resources.loadTexture("start_background", "resources/GameMenu.png");
-    resources.loadTexture("background", "resources/Hall.png");
-    resources.loadTexture("start_background", "resources/GameMenu.png");
     resources.loadTexture("play_btn", "resources/play.png");
     resources.loadTexture("rules_btn", "resources/rules.png");
     resources.loadTexture("button_menu", "resources/ButtonMenu.png");
@@ -36,9 +33,9 @@ Controller::Controller()
     resources.loadTexture("help3", "resources/help3.PNG");
     resources.loadTexture("back_btn", "resources/back.png");
     resources.loadTexture("next_btn", "resources/continue.png");
+    resources.loadTexture("Scientist", "resources/Scientist.png");
 
     resources.loadSound("missile_alarm", "resources/MissileAlarm.wav");
-    resources.loadTexture("Scientist", "resources/Scientist.png"); // <-- AJOUT
     resources.loadSound("piggy", "resources/Piggy.wav");
     resources.loadSound("shield_speed", "resources/ShieldSpeed.ogg");
     resources.loadSound("zapper", "resources/ZapperSound.wav");
