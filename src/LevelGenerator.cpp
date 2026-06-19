@@ -13,7 +13,9 @@ LevelGenerator::LevelGenerator()
 {
 }
 
-void LevelGenerator::generate(float deltaTime,std::vector<std::unique_ptr<Object>>& objects,Player& player)
+void LevelGenerator::generate(float deltaTime,
+    std::vector<std::unique_ptr<Object>>& objects,
+    Player& player)
 {
     float playerX = player.getPosition().x;
     float currentSpawnZoneX = playerX + 1400.0f;

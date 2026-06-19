@@ -5,6 +5,7 @@
 #include "BoostState.h"
 #include "SuperPowerRunnerState.h"
 #include "PlayerState.h"
+#include "AudioManager.h"
 
 Player::Player()
     : MovingGameObject(Resources::getInstance().getTexture("player"), 300.0f),
@@ -64,8 +65,12 @@ void Player::applyStandardPhysics(float deltaTime, bool useJetpack) {
 }
 
 void Player::activateSpeedBoost(float distanceInPixels) {
-    if (isDead()) return;
+    if (isDead() || isSuperPowerRunner()) {
+        return; 
+    }
+    
     changeState(std::make_unique<BoostState>(m_sprite.getPosition().x, distanceInPixels));
+    AudioManager::getInstance().playSound("shield_speed");
 }
 
 void Player::stopBoost() {
@@ -78,9 +83,12 @@ void Player::stopBoost() {
 }
 
 void Player::activateSuperPowerRunner() {
-    if (!isDead()) {
-        changeState(std::make_unique<SuperPowerRunnerState>(*this));
+    // LE VERROU INVERSE : Si le joueur est en plein boost, il ne peut pas mettre le costume.
+    if (isDead() || isSpeedBoosting()) {
+        return;
     }
+
+    changeState(std::make_unique<SuperPowerRunnerState>(*this));
 }
 
 void Player::setDead(bool dead) {

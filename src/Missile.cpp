@@ -101,6 +101,29 @@ void Missile::draw(sf::RenderWindow& window) const {
     }
 }
 
+sf::FloatRect Missile::getGlobalBounds() const {
+    // 1. Si le missile est encore en mode alerte (Warning), sa hitbox est nulle.
+    // Le joueur ne peut pas mourir en touchant l'icône de point d'exclamation.
+    if (m_status == MissileStatus::Warning) {
+        return sf::FloatRect({ 0.f, 0.f }, { 0.f, 0.f });
+    }
+
+    // 2. Récupération de la boîte globale brute du sprite en plein vol
+    sf::FloatRect bounds = m_sprite.getGlobalBounds();
+
+    // Comme ton missile vole vers la GAUCHE, l'avant (la tête) se situe au niveau de bounds.position.x
+    // On réduit la largeur à 40% de la taille du sprite pour ignorer complètement la flamme arrière.
+    bounds.size.x *= 0.40f;
+
+    // Épaississement de tolérance : On réduit aussi la hauteur de 20% (haut et bas) 
+    // pour donner au joueur cette sensation gratifiante de "l'avoir esquivé de justesse" (Pixel Perfect feel)
+    float originalHeight = bounds.size.y;
+    bounds.size.y *= 0.80f;
+    bounds.position.y += (originalHeight - bounds.size.y) / 2.0f; // Réajustement du centrage vertical
+
+    return bounds;
+}
+
 void Missile::collide(Object& other) {
     other.collide(*this);
 }

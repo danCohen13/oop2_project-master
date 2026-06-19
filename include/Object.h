@@ -25,7 +25,7 @@ public:
 
     void setPosition(const sf::Vector2f& position);
     sf::Vector2f getPosition() const;
-    sf::FloatRect getGlobalBounds() const;
+    virtual sf::FloatRect getGlobalBounds() const;
     sf::FloatRect getLocalBounds() const;
 
 protected:

@@ -18,6 +18,8 @@ public:
 
     virtual bool isDisposed() const override { return m_isDisposed; };
 
+    virtual sf::FloatRect getGlobalBounds() const override;
+
 private:
     Player& m_player;
     MissileStatus m_status;
