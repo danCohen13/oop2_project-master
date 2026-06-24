@@ -17,7 +17,6 @@ public:
     Board(const Board&) = delete;
     Board& operator=(const Board&) = delete;
 
-    // NOUVEAU : On injecte la gameSpeed calculée par la GameSession
     void play(float deltaTime, float gameSpeed, bool isThrusting);
     void draw(sf::RenderWindow& window) const;
 
@@ -25,7 +24,6 @@ public:
     sf::Vector2f getPlayerPosition() const;
     Player* getPlayer() const { return m_player.get(); }
 
-    // Getters d'événements pour la GameSession
     int getCoinsCollectedThisFrame() const;
     bool hasPlayerHitHazard() const;
 
@@ -37,7 +35,6 @@ private:
     std::unique_ptr<LevelGenerator> m_levelGenerator;
     std::unique_ptr<ObjectCleaner> m_objectCleaner;
 
-    // Variables temporaires stockant les événements de la frame
     int m_coinsCollected;
     bool m_hazardHit;
 };

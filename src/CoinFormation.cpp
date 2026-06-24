@@ -7,9 +7,6 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-// =============================================================================
-// FORMATIONS PUBLIQUES (inchangees)
-// =============================================================================
 
 void CoinFormation::createLine(std::vector<std::unique_ptr<Object>>& objects,
     float startX, float startY,
@@ -77,10 +74,6 @@ void CoinFormation::createCircle(std::vector<std::unique_ptr<Object>>& objects,
     }
 }
 
-// =============================================================================
-// CREATEURS ALEATOIRES PRIVES
-// Chacun choisit ses propres parametres et retourne sa largeur generee.
-// =============================================================================
 
 float CoinFormation::createLineRandom(std::vector<std::unique_ptr<Object>>& objects,
     float spawnX, float ceiling,
@@ -160,10 +153,6 @@ float CoinFormation::createCircleRandom(std::vector<std::unique_ptr<Object>>& ob
     return radius * 2.0f;
 }
 
-// =============================================================================
-// POINT D'ENTREE ALEATOIRE — tableau de pointeurs de fonctions
-// Ajouter une formation = ajouter une ligne dans creators[].
-// =============================================================================
 
 float CoinFormation::createRandom(std::vector<std::unique_ptr<Object>>& objects,
     float spawnX,

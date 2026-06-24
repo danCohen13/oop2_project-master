@@ -2,7 +2,6 @@
 #include "Resources.h"
 
 Coin::Coin(const sf::Vector2f& position)
-// CORRECTION : Coin.png fait 320x40px = 8 frames de 40px chacune
     : StaticGameObject(Resources::getInstance().getTexture("Coin"), position, 8),
     m_isDisposed(false)
 {

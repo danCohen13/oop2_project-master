@@ -24,7 +24,6 @@ private:
     BackgroundSystem m_backgroundSystem;
     InputHandler m_inputHandler;
 
-    // Composants du système de pause
     sf::Sprite m_pauseHUDButton;
     bool m_isPaused;
     sf::RectangleShape m_pauseOverlay;
@@ -35,7 +34,6 @@ private:
 
     sf::Vector2f m_mousePos;
 
-    // Gestion du déclenchement du GameOver
     float m_gameOverTimer;
     bool m_gameOverScreenPushed;
 };

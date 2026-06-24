@@ -10,9 +10,8 @@ GameSession::GameSession()
 }
 
 void GameSession::update(float deltaTime, bool isThrusting) {
-    Player* player = m_board.getPlayer(); // On récupère l'instance du joueur pour ajuster son invincibilité
+    Player* player = m_board.getPlayer();
 
-    // 1. GESTION DE LA VITESSE ET DU FREINAGE (FRICTION)
     if (!isGameOver()) {
         if (m_normalGameSpeed < 900.0f) {
             m_normalGameSpeed += 3.5f * deltaTime;
@@ -20,27 +19,25 @@ void GameSession::update(float deltaTime, bool isThrusting) {
 
         if (player && player->isSpeedBoosting()) {
             m_gameSpeed = 1600.0f;
-            m_boostCooldownTimer = 2.5f; // On arme le timer à 2.5 secondes de sécurité
-            player->setInvincible(true);  // Sécurité redondante
+            m_boostCooldownTimer = 2.5f;
+            player->setInvincible(true);  
         }
         else {
             if (m_gameSpeed > m_normalGameSpeed) {
-                m_gameSpeed -= 600.0f * deltaTime; // Décélération progressive
+                m_gameSpeed -= 600.0f * deltaTime; 
                 if (m_gameSpeed < m_normalGameSpeed) {
                     m_gameSpeed = m_normalGameSpeed;
                 }
-                if (player) player->setInvincible(true); // Toujours invincible pendant l'entre-deux !
+                if (player) player->setInvincible(true); 
             }
             else {
                 m_gameSpeed = m_normalGameSpeed;
 
-                // On est enfin revenu à la vitesse normale ! Le cooldown de 2.5s commence à expirer
                 if (m_boostCooldownTimer > 0.0f) {
                     m_boostCooldownTimer -= deltaTime;
-                    if (player) player->setInvincible(true); // Reste protégé pendant les 2-3 secondes
+                    if (player) player->setInvincible(true); 
                 }
                 else {
-                    // Le délai est totalement écoulé, le joueur redevient mortel de manière sécurisée
                     if (player && player->isInvincible()) {
                         player->setInvincible(false);
                     }
@@ -55,10 +52,8 @@ void GameSession::update(float deltaTime, bool isThrusting) {
         }
     }
 
-    // 2. Mise à jour physique du monde
     m_board.play(deltaTime, m_gameSpeed, isThrusting);
 
-    // 3. RÈGLES DE JEU
     if (!isGameOver()) {
         int coins = m_board.getCoinsCollectedThisFrame();
         if (coins > 0) {

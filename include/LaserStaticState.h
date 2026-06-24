@@ -3,5 +3,5 @@
 
 class LaserStaticState : public LaserState {
 public:
-    void rotate(Laser* laser, float deltaTime) override {} // immobile
+    void rotate(Laser* laser, float deltaTime) override {} 
 };

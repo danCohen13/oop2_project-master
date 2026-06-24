@@ -27,11 +27,7 @@ Player::Player()
 
 void Player::update(float deltaTime, bool isThrusting) {
     m_isThrusting = isThrusting;
-
-    // 1. Mise à jour de l'état actif
     m_state->update(*this, deltaTime);
-
-    // 2. RÈGLE DU DÉPÔT : Mise à jour physique autonome de la position de la flamme
     m_exhaust.update(deltaTime, m_sprite.getPosition());
 }
 
@@ -83,7 +79,6 @@ void Player::stopBoost() {
 }
 
 void Player::activateSuperPowerRunner() {
-    // LE VERROU INVERSE : Si le joueur est en plein boost, il ne peut pas mettre le costume.
     if (isDead() || isSpeedBoosting()) {
         return;
     }

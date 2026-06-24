@@ -13,12 +13,10 @@ public:
         const sf::Sprite& playerSprite,
         const Exhaust& exhaust) const = 0;
 
-    // Propriétés virtuelles fausses par défaut
     virtual bool isDead()           const { return false; }
     virtual bool isInvincible()     const { return false; }
     virtual bool isSpeedBoosting()   const { return false; }
     virtual bool isSuperPowerRunner() const { return false; }
 
-    // Dispatch polymorphique de la gestion des dégâts
     virtual void handleHit(Player& player);
 };

@@ -29,42 +29,31 @@ Board::Board()
 Board::~Board() = default;
 
 void Board::play(float deltaTime, float gameSpeed, bool isThrusting) {
-    // 1. Réinitialisation des événements pour cette frame
     m_coinsCollected = 0;
     bool wasAlive = !m_player->isDead();
 
-    // 2. Mise à jour du joueur (Gestion interne du Jetpack Y)
     m_player->update(deltaTime, isThrusting);
 
-    // NOUVEAU : On force le joueur à avancer sur l'axe X à la vitesse de la session.
-    // Comme la caméra (dans GamePlayScreen) suit le joueur, c'est ça qui crée le défilement !
     sf::Vector2f pos = m_player->getPosition();
     m_player->setPosition({ pos.x + (gameSpeed * deltaTime), pos.y });
 
-    // 3. Mise à jour des objets statiques (ex: l'animation vibrante des lasers)
     for (auto& obj : m_objects) {
         obj->update(deltaTime);
     }
 
-    // 4. Gestion des collisions (Double Dispatch)
     m_collisionManager->handleCollisions(*m_player, m_objects);
 
-    // 5. Lecture des conséquences de la physique
     if (wasAlive && m_player->isDead()) {
-        m_hazardHit = true; // Le laser a tué le joueur
+        m_hazardHit = true; 
     }
 
     for (const auto& obj : m_objects) {
-        // Un objet marqué 'disposed' après une collision (ex: Coin) est considéré comme ramassé
         if (obj->isDisposed()) {
             m_coinsCollected++;
         }
     }
 
-    // 6. Génération procédurale (basée sur la nouvelle position X du joueur)
     m_levelGenerator->generate(deltaTime, m_objects, *m_player);
-    // 7. Nettoyage
-    // L'ObjectCleaner va détruire les pièces ramassées et les objets laissés derrière la caméra
     m_objectCleaner->cleanup(m_objects, m_player->getPosition().x);
 }
 

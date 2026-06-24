@@ -3,18 +3,16 @@
 #include "Resources.h"
 #include <cmath>
 
-// Fonction d'ingénierie pour déduire le nombre de frames de tes icônes carrées
 int determineFrameCount(const sf::Texture& texture) {
     int count = static_cast<int>(texture.getSize().x / texture.getSize().y);
     return (count > 0) ? count : 1;
 }
 
-// CORRECTION VISÉE : La signature correspond maintenant exactement à Missile.h
 Missile::Missile(Player& player, float yOffset)
     : MovingGameObject(Resources::getInstance().getTexture("Missile"), 650.0f),
     m_player(player),
     m_status(MissileStatus::Warning),
-    m_yOffset(yOffset), // Initialisé au bon endroit selon l'ordre de déclaration de Missile.h
+    m_yOffset(yOffset), 
     m_missileAnimator(Resources::getInstance().getTexture("Missile"), 7, 0.05f),
     m_warningAnimator(Resources::getInstance().getTexture("MissileWarning"), determineFrameCount(Resources::getInstance().getTexture("MissileWarning")), 0.08f),
     m_incomingAnimator(Resources::getInstance().getTexture("MissileIncoming"), determineFrameCount(Resources::getInstance().getTexture("MissileIncoming")), 0.05f),
@@ -22,17 +20,14 @@ Missile::Missile(Player& player, float yOffset)
     m_warningTimer(0.0f),
     m_isDisposed(false)
 {
-    // Initialisation et centrage de la frame unique du missile
     m_missileAnimator.applyTo(m_sprite);
     auto missileSize = m_missileAnimator.getFrameSize();
     m_sprite.setOrigin({ static_cast<float>(missileSize.x) / 2.0f, static_cast<float>(missileSize.y) / 2.0f });
 
-    // Initialisation et centrage de la première frame du warning jaune
     m_warningAnimator.applyTo(m_warningSprite);
     auto warningSize = m_warningAnimator.getFrameSize();
     m_warningSprite.setOrigin({ static_cast<float>(warningSize.x) / 2.0f, static_cast<float>(warningSize.y) / 2.0f });
 
-    // Sécurité indispensable anti-ObjectCleaner
     m_sprite.setPosition({ player.getPosition().x + 2000.0f, 0.0f });
 }
 
@@ -45,20 +40,16 @@ void Missile::update(float deltaTime) {
     if (m_status == MissileStatus::Warning) {
         m_warningTimer += deltaTime;
 
-        // Calcul de la hauteur cible (bloquée dans les limites du hangar)
         float targetY = m_player.getPosition().y + 40.0f + m_yOffset;
         if (targetY < 60.0f)  targetY = 60.0f;
         if (targetY > 520.0f) targetY = 520.0f;
 
-        // Positionnement sur le bord droit de l'écran visible
         float warningX = cameraX + (VIRTUAL_SCREEN_WIDTH / 2.0f) - 45.0f;
 
         m_warningSprite.setPosition({ warningX, targetY });
         m_sprite.setPosition({ warningX, targetY });
 
-        // Gestion des deux étapes d'animation de l'alerte
         if (m_warningTimer > WARNING_DURATION * 0.7f) {
-            // ÉTAPE B : Flèche rouge d'impact imminent
             m_incomingAnimator.update(deltaTime);
             m_incomingAnimator.applyTo(m_warningSprite);
             m_warningSprite.setTexture(Resources::getInstance().getTexture("MissileIncoming"));
@@ -67,7 +58,6 @@ void Missile::update(float deltaTime) {
             m_warningSprite.setOrigin({ static_cast<float>(size.x) / 2.0f, static_cast<float>(size.y) / 2.0f });
         }
         else {
-            // ÉTAPE A : Point d'exclamation jaune standard
             m_warningAnimator.update(deltaTime);
             m_warningAnimator.applyTo(m_warningSprite);
             m_warningSprite.setTexture(Resources::getInstance().getTexture("MissileWarning"));
@@ -76,7 +66,6 @@ void Missile::update(float deltaTime) {
             m_warningSprite.setOrigin({ static_cast<float>(size.x) / 2.0f, static_cast<float>(size.y) / 2.0f });
         }
 
-        // FIN DU TIMER : LANCEMENT DU MISSILE
         if (m_warningTimer >= WARNING_DURATION) {
             m_status = MissileStatus::Flying;
             m_sprite.setPosition({ cameraX + (VIRTUAL_SCREEN_WIDTH / 2.0f) + 80.0f, targetY });
@@ -85,7 +74,6 @@ void Missile::update(float deltaTime) {
     else if (m_status == MissileStatus::Flying) {
         m_sprite.move({ -m_speed * deltaTime, 0.0f });
 
-        // Animation de la flamme arrière du missile
         if (m_missileAnimator.update(deltaTime)) {
             m_missileAnimator.applyTo(m_sprite);
         }
@@ -102,24 +90,17 @@ void Missile::draw(sf::RenderWindow& window) const {
 }
 
 sf::FloatRect Missile::getGlobalBounds() const {
-    // 1. Si le missile est encore en mode alerte (Warning), sa hitbox est nulle.
-    // Le joueur ne peut pas mourir en touchant l'icône de point d'exclamation.
     if (m_status == MissileStatus::Warning) {
         return sf::FloatRect({ 0.f, 0.f }, { 0.f, 0.f });
     }
 
-    // 2. Récupération de la boîte globale brute du sprite en plein vol
     sf::FloatRect bounds = m_sprite.getGlobalBounds();
 
-    // Comme ton missile vole vers la GAUCHE, l'avant (la tête) se situe au niveau de bounds.position.x
-    // On réduit la largeur à 40% de la taille du sprite pour ignorer complètement la flamme arrière.
     bounds.size.x *= 0.40f;
 
-    // Épaississement de tolérance : On réduit aussi la hauteur de 20% (haut et bas) 
-    // pour donner au joueur cette sensation gratifiante de "l'avoir esquivé de justesse" (Pixel Perfect feel)
     float originalHeight = bounds.size.y;
     bounds.size.y *= 0.80f;
-    bounds.position.y += (originalHeight - bounds.size.y) / 2.0f; // Réajustement du centrage vertical
+    bounds.position.y += (originalHeight - bounds.size.y) / 2.0f; 
 
     return bounds;
 }
@@ -130,14 +111,13 @@ void Missile::collide(Object& other) {
 
 void Missile::collide(Player& player) {
     if (player.isSpeedBoosting()) {
-        m_isDisposed = true; // Désintégration immédiate de l'obstacle !
+        m_isDisposed = true; 
     }
-    // AJOUT : Si le missile touche le costume de gravité, le missile s'autodétruit
     else if (player.isSuperPowerRunner()) {
         m_isDisposed = true;
-        player.setDead(true); // Le joueur perd son costume mais survit
+        player.setDead(true);
     }
     else {
-        player.setDead(true); // Mort normale
+        player.setDead(true); 
     }
 }

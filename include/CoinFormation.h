@@ -5,7 +5,6 @@
 
 class CoinFormation {
 public:
-    // --- Formations publiques utilisables directement ---
     static void createLine(std::vector<std::unique_ptr<Object>>& objects,
         float startX, float startY,
         float spacing, int length, int thickness);
@@ -26,9 +25,6 @@ public:
         float startX, float startY,
         float spacing, int radiusFactor);
 
-    // --- Choix aleatoire d'une formation ---
-    // Retourne la largeur generee (generationWidth) pour que LevelGenerator
-    // puisse calculer m_nextSpawnX sans connaitre les details de chaque formation.
     static float createRandom(std::vector<std::unique_ptr<Object>>& objects,
         float spawnX,
         float ceilingLimit,
@@ -36,8 +32,6 @@ public:
         float coinSpacing);
 
 private:
-    // --- Createurs aleatoires prives (un par formation) ---
-    // Chacun gere ses propres parametres aleatoires et retourne sa largeur.
     static float createLineRandom(std::vector<std::unique_ptr<Object>>& objects,
         float spawnX, float ceiling,
         float floor, float spacing);

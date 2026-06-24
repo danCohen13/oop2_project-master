@@ -5,7 +5,6 @@
 namespace AssetLoader {
 
     namespace {
-        // Détail d'implémentation : pas besoin d'être visible en dehors de ce fichier.
         void loadTextures() {
             auto& resources = Resources::getInstance();
 

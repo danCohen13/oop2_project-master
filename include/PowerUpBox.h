@@ -10,9 +10,8 @@ public:
     virtual void collide(Object& other) override;
     virtual void collide(Player& player) override;
 
-    // Surcharge pour indiquer au Board quand supprimer la boîte
     virtual bool isDisposed() const override { return m_isDisposed; }
 
 private:
-    bool m_isDisposed; // Drapeau de suppression
+    bool m_isDisposed; 
 };

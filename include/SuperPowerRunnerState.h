@@ -22,5 +22,5 @@ private:
     bool m_lastThrustingState;
     SpriteAnimator m_animator;
 
-    sf::Vector2f m_suitFrameSize; // <-- AJOUT CRUCIAL : Stockage au format float
+    sf::Vector2f m_suitFrameSize; 
 };

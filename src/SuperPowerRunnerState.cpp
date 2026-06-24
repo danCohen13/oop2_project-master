@@ -12,14 +12,12 @@ SuperPowerRunnerState::SuperPowerRunnerState(Player& player)
     auto& sprite = player.getSprite();
     const auto& suitTex = Resources::getInstance().getTexture("SuperPowerRunner");
 
-    // SFML Conversion native implicite : unsigned int -> float d'un seul coup
     sf::Vector2f texSize(suitTex.getSize());
     m_suitFrameSize = { texSize.x / 4.f, texSize.y };
 
     sprite.setTexture(suitTex, false);
     m_animator.applyTo(sprite);
 
-    // Plus besoin de casts, m_suitFrameSize est déjà un vecteur de floats
     sf::Vector2f currentPos = sprite.getPosition();
     sprite.setOrigin(m_suitFrameSize / 2.f);
     sprite.setPosition(currentPos + m_suitFrameSize / 2.f);
@@ -44,7 +42,6 @@ void SuperPowerRunnerState::update(Player& player, float deltaTime) {
     m_animator.update(deltaTime);
     m_animator.applyTo(sprite);
 
-    // Zéro cast ici, utilisation directe des propriétés du float vector
     sprite.setOrigin(m_suitFrameSize / 2.f);
     sprite.setScale({ 1.f, m_gravityInverted ? -1.0f : 1.0f });
 
@@ -68,7 +65,6 @@ void SuperPowerRunnerState::update(Player& player, float deltaTime) {
 void SuperPowerRunnerState::handleHit(Player& player) {
     const auto& normalTex = Resources::getInstance().getTexture("player");
 
-    // Même astuce pour le joueur normal : conversion de vecteur instantanée
     sf::Vector2f normalTexSize(normalTex.getSize());
     sf::Vector2f normalFrameSize = { normalTexSize.x / 4.f, normalTexSize.y };
 
@@ -80,7 +76,6 @@ void SuperPowerRunnerState::handleHit(Player& player) {
     sprite.setScale({ 1.f, 1.f });
     sprite.setRotation(sf::degrees(0.f));
 
-    // Les opérations mathématiques entre Vector2f se font nativement
     sf::Vector2f topLeftPos = centerPos - normalFrameSize / 2.f;
 
     if (topLeftPos.y > player.getFloorY()) topLeftPos.y = player.getFloorY();

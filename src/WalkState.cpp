@@ -15,7 +15,6 @@ void WalkState::update(Player& player, float deltaTime) {
         return;
     }
 
-    // RÈGLE GITHUB : Au sol, le Jetpack est éteint
     player.getExhaust().setActive(false);
 
     m_animator.update(deltaTime);

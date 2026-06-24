@@ -14,7 +14,7 @@ public:
 
 private:
     sf::Sprite m_backgroundSprite;
-    sf::Sprite m_titleSprite; // AJOUT : Sprite pour le titre/logo du jeu
+    sf::Sprite m_titleSprite; 
 
     std::unique_ptr<Button> m_playButton;
     std::unique_ptr<Button> m_rulesButton;

@@ -6,7 +6,6 @@
 void PlayerState::handleHit(Player& player) {
     if (isInvincible() || player.isInvincible()) return;
 
-    // Comportement par défaut (Walk / Jump) : Mort immédiate
     player.changeState(std::make_unique<DeadState>());
 
     auto& sprite = player.getSprite();

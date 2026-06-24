@@ -24,7 +24,6 @@ private:
     Player& m_player;
     MissileStatus m_status;
 
-    // Des animateurs spécialisés pour chaque texture
     SpriteAnimator m_missileAnimator;
     SpriteAnimator m_warningAnimator;
     SpriteAnimator m_incomingAnimator;

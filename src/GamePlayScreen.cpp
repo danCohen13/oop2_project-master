@@ -35,7 +35,7 @@ void GameplayScreen::handleEvent(const sf::Event& event) {
     }
 
     if (m_inputHandler.isEscapePressed(event)) {
-        if (!m_session->isGameOver()) { // Bloque la pause si le joueur est mort
+        if (!m_session->isGameOver()) { 
             m_isPaused = !m_isPaused;
         }
         return;
@@ -80,10 +80,8 @@ void GameplayScreen::update(float deltaTime) {
     m_hud.updateTexts(m_session->getScore(), m_session->getLives(), m_session->getDistanceInMeters());
     m_backgroundSystem.update(deltaTime, m_session->getPlayerPosition().x);
 
-    // --- GESTION ET LANCEMENT DU PANNEAU GAME OVER ---
     if (m_session->isGameOver()) {
         m_gameOverTimer += deltaTime;
-        // Laisse 2 secondes au défilement pour ralentir dramatiquement avant d'ouvrir l'écran
         if (m_gameOverTimer >= 2.0f && !m_gameOverScreenPushed) {
             m_gameOverScreenPushed = true;
             m_stack.push(std::make_unique<GameOverScreen>(

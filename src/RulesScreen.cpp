@@ -8,16 +8,13 @@ RulesScreen::RulesScreen(ScreenStack& stack)
     m_pages({ "help1", "help2", "help3" }),
     m_mousePos(0.f, 0.f)
 {
-    // Redimensionnement de l'image d'aide initiale
     auto bgSize = Resources::getInstance().getTexture("help1").getSize();
     m_backgroundSprite.setScale({ 1200.f / bgSize.x, 600.f / bgSize.y });
 
     const auto& font = Resources::getInstance().getFont();
 
-    // Boutons stylisés bleus interactifs
     m_backButton = std::make_unique<Button>(sf::Vector2f{ 120.0f, 50.0f }, sf::Vector2f{ 160.0f, 50.0f }, "Back", font);
 
-    // CORRECTION EMPLACEMENT : Le bouton continue est replacé idéalement à l'intérieur de la vue
     m_nextButton = std::make_unique<Button>(sf::Vector2f{ 1050.0f, 530.0f }, sf::Vector2f{ 200.0f, 50.0f }, "Continue", font);
 }
 

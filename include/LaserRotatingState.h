@@ -7,5 +7,5 @@ public:
     void rotate(Laser* laser, float deltaTime) override;
 
 private:
-    int m_direction; // +1 ou -1
+    int m_direction; 
 };

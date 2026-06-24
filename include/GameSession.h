@@ -25,6 +25,5 @@ private:
     float m_gameSpeed;
     float m_normalGameSpeed;
 
-    // Timer pour prolonger l'invincibilité après le retour à la vitesse normale
     float m_boostCooldownTimer;
 };

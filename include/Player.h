@@ -17,29 +17,23 @@ public:
     virtual void collide(Object& other) override;
     virtual void collide(Player&) override {}
 
-    // Requêtes d'état transmises polymorphiquement
     bool isDead() const;
     void setDead(bool dead);
     bool isThrusting() const;
     bool isSpeedBoosting() const;
     bool isSuperPowerRunner() const;
 
-    // Invincibilité externe requise par GameSession
     void setInvincible(bool invincible) { m_isInvincible = invincible; }
     bool isInvincible() const;
 
-    // Gestionnaire des transitions d'état
     void changeState(std::unique_ptr<PlayerState> newState);
 
-    // Actions de déclenchement des bonus
     void activateSpeedBoost(float distanceInPixels);
     void stopBoost();
     void activateSuperPowerRunner();
 
-    // Physique standard partagée
     void applyStandardPhysics(float deltaTime, bool useJetpack);
 
-    // Accesseurs
     float getFloorY() const { return m_floorY; }
     float getCeilingY() const { return CEILING_Y; }
     float getVerticalVelocity() const { return m_verticalVelocity; }

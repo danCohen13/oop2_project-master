@@ -1,30 +1,28 @@
 ﻿#include "Controller.h"
 #include "GameException.h"
 #include <iostream>
-#include <cstdlib> // Pour EXIT_SUCCESS et EXIT_FAILURE
+#include <cstdlib> 
 
 int main() {
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     try {
-        // Le jeu essaie de se lancer normalement
         Controller game;
         game.run();
     }
     catch (const GameException& e) {
-        // Si l'une de VOS exceptions est levée (ex: image manquante)
-        std::cerr << "\n[ERREUR DU JEU] " << e.what() << "\n\n";
+        std::cerr << "\n[ERROR OF THE GAME] " << e.what() << "\n\n";
         return EXIT_FAILURE;
     }
     catch (const std::exception& e) {
         // Si une exception C++ standard survient (ex: manque de mémoire RAM)
-        std::cerr << "\n[ERREUR STANDARD] " << e.what() << "\n\n";
+        std::cerr << "\n[STANDARD ERROR] " << e.what() << "\n\n";
         return EXIT_FAILURE;
     }
     catch (...) {
         // Le filet de sécurité ultime pour les erreurs inconnues
-        std::cerr << "\n[ERREUR FATALE] Une erreur inconnue est survenue.\n\n";
+        std::cerr << "\n[FATAL ERROR] Unkown error happened.\n\n";
         return EXIT_FAILURE;
     }
 

@@ -6,19 +6,16 @@
 #define M_PI 3.14159265358979323846
 #endif
 
-// =============================================================================
-// COINS ARRONDIS — meme technique geometrique que Button et GameOverScreen
-// =============================================================================
 sf::ConvexShape HUD::makeRoundedRect(const sf::Vector2f& size, float radius) {
     const int segmentsPerCorner = 6;
     std::vector<sf::Vector2f> points;
 
     struct CornerCenter { float cx, cy, startAngleDeg; };
     CornerCenter corners[4] = {
-        { radius,          radius,          180.f }, // haut-gauche
-        { size.x - radius, radius,          270.f }, // haut-droit
-        { size.x - radius, size.y - radius,   0.f }, // bas-droit
-        { radius,          size.y - radius,  90.f }, // bas-gauche
+        { radius,          radius,          180.f }, 
+        { size.x - radius, radius,          270.f }, 
+        { size.x - radius, size.y - radius,   0.f }, 
+        { radius,          size.y - radius,  90.f }, 
     };
 
     for (const auto& c : corners) {
@@ -39,9 +36,6 @@ sf::ConvexShape HUD::makeRoundedRect(const sf::Vector2f& size, float radius) {
     return shape;
 }
 
-// =============================================================================
-// CONSTRUCTEUR
-// =============================================================================
 HUD::HUD()
     : m_font(),
     m_scoreText(m_font, ""),
@@ -49,16 +43,13 @@ HUD::HUD()
     m_distanceText(m_font, "")
 {
     if (!m_font.openFromFile("resources/New Athletic M54.ttf")) {
-        std::cerr << "Erreur: Impossible de charger la police pour le HUD.\n";
+        std::cerr << "Error: Impossible to charge the police for the HUD.\n";
     }
 
     const float cornerRadius = 14.f;
 
-    // -------------------------------------------------------------------
-    // PANNEAU GAUCHE — Score + Vies regroupes dans le meme verre
-    // -------------------------------------------------------------------
     sf::Vector2f leftPanelSize{ 230.f, 90.f };
-    sf::Vector2f leftPanelPos{ 20.f, 15.f }; // coin haut-gauche du panneau
+    sf::Vector2f leftPanelPos{ 20.f, 15.f }; 
 
     m_leftPanelBase = makeRoundedRect(leftPanelSize, cornerRadius);
     m_leftPanelBase.setFillColor(sf::Color(40, 60, 95, 100));
@@ -74,22 +65,16 @@ HUD::HUD()
     m_leftPanelHighlight.setFillColor(sf::Color(255, 255, 255, 25));
     m_leftPanelHighlight.setPosition(leftPanelPos);
 
-    // Texte Score — en haut du panneau gauche
     m_scoreText.setCharacterSize(26);
     m_scoreText.setFillColor(sf::Color::White);
     m_scoreText.setStyle(sf::Text::Bold);
     m_scoreText.setPosition({ leftPanelPos.x + 18.f, leftPanelPos.y + 8.f });
 
-    // Texte Vies — juste sous le score, meme panneau
     m_livesText.setCharacterSize(22);
     m_livesText.setFillColor(sf::Color(255, 110, 110));
     m_livesText.setPosition({ leftPanelPos.x + 18.f, leftPanelPos.y + 48.f });
 
-    // -------------------------------------------------------------------
-    // PANNEAU DROIT — Distance seule
-    // -------------------------------------------------------------------
     sf::Vector2f rightPanelSize{ 150.f, 56.f };
-    // Positionne a droite, dans une fenetre de 1200px de large
     sf::Vector2f rightPanelPos{ 1200.f - rightPanelSize.x - 20.f, 15.f };
 
     m_rightPanelBase = makeRoundedRect(rightPanelSize, cornerRadius);
@@ -106,37 +91,27 @@ HUD::HUD()
     m_rightPanelHighlight.setFillColor(sf::Color(255, 255, 255, 25));
     m_rightPanelHighlight.setPosition(rightPanelPos);
 
-    // Texte Distance — centre verticalement dans son panneau
     m_distanceText.setCharacterSize(26);
     m_distanceText.setFillColor(sf::Color(255, 220, 110));
     m_distanceText.setStyle(sf::Text::Bold);
     m_distanceText.setPosition({ rightPanelPos.x + 18.f, rightPanelPos.y + 14.f });
 
-    // Remplissage initial
     updateTexts(0, 1, 0);
 }
 
-// =============================================================================
-// UPDATE DES TEXTES — inchange dans la logique, juste le contenu des chaines
-// =============================================================================
 void HUD::updateTexts(int score, int lives, int distance) {
     m_scoreText.setString("Score: " + std::to_string(score));
-    m_livesText.setString("Vies: " + std::to_string(lives));
+    m_livesText.setString("Lives: " + std::to_string(lives));
     m_distanceText.setString(std::to_string(distance) + " m");
 }
 
-// =============================================================================
-// DRAW — chaque panneau : base, reflet, bordure, puis ses textes par-dessus
-// =============================================================================
 void HUD::draw(sf::RenderWindow& window) const {
-    // Panneau gauche (Score + Vies)
     window.draw(m_leftPanelBase);
     window.draw(m_leftPanelHighlight);
     window.draw(m_leftPanelBorder);
     window.draw(m_scoreText);
     window.draw(m_livesText);
 
-    // Panneau droit (Distance)
     window.draw(m_rightPanelBase);
     window.draw(m_rightPanelHighlight);
     window.draw(m_rightPanelBorder);

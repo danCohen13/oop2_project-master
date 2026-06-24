@@ -15,7 +15,6 @@ public:
         Player& player);
 
 private:
-    // --- Sous-responsabilites privees ---
     void  spawnMissiles(float deltaTime,
         std::vector<std::unique_ptr<Object>>& objects,
         Player& player, float playerX);
@@ -23,12 +22,10 @@ private:
     float spawnLaser(std::vector<std::unique_ptr<Object>>& objects,
         float spawnX);
 
-    // --- Etat ---
     float m_nextSpawnX;
     float m_missileTimer;
     float m_nextMissileDelay;
 
-    // --- Constantes ---
     static constexpr float COIN_SPACING = 48.0f;
     static constexpr float CEILING_LIMIT = 50.0f;
     static constexpr float FLOOR_LIMIT = 530.0f;

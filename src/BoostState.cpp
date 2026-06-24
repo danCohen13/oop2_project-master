@@ -21,7 +21,6 @@ void BoostState::update(Player& player, float deltaTime) {
 void BoostState::draw(sf::RenderWindow& window, const sf::Sprite& playerSprite, const Exhaust&) const {
     window.draw(playerSprite);
 
-    // SFML 3.0 FIX: Allocation sécurisée avec Texture incluse d'office
     const sf::Texture& flameTex = Resources::getInstance().getTexture("speedflame");
     sf::Sprite flameSprite(flameTex);
     m_speedFlameAnimator.applyTo(flameSprite);
