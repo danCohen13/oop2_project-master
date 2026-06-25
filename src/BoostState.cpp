@@ -4,7 +4,9 @@
 
 BoostState::BoostState(float currentX, float distanceInPixels)
     : m_targetX(currentX + distanceInPixels),
-    m_speedFlameAnimator(Resources::getInstance().getTexture("speedflame"), 3, 0.05f) {
+    // CORRECTION : Ta spritesheet comporte exactement 6 sous-images (684 / 114 = 6)
+    m_speedFlameAnimator(Resources::getInstance().getTexture("speedflame"), 6, 0.05f)
+{
 }
 
 void BoostState::update(Player& player, float deltaTime) {
@@ -25,10 +27,17 @@ void BoostState::draw(sf::RenderWindow& window, const sf::Sprite& playerSprite, 
     sf::Sprite flameSprite(flameTex);
     m_speedFlameAnimator.applyTo(flameSprite);
 
-    auto frameSize = m_speedFlameAnimator.getFrameSize();
-    flameSprite.setOrigin({ 0.0f, static_cast<float>(frameSize.y) / 2.0f });
+    // Récupération de la taille de la frame convertie nativement en flottants (Zéro static_cast)
+    sf::Vector2f frameSize(m_speedFlameAnimator.getFrameSize());
 
-    flameSprite.setPosition(playerSprite.getPosition() + sf::Vector2f(-45.f, 10.f));
+    // Ancrage centré verticalement sur le flanc gauche de la flamme
+    flameSprite.setOrigin({ 0.0f, frameSize.y / 2.0f });
+
+    // CORRECTION : Décalage augmenté vers la gauche (-85.f au lieu de -45.f)
+    // Ajuste cette valeur si tu veux la coller encore plus en arrière contre le jetpack
+    sf::Vector2f precisionOffset = { -85.0f, 10.0f };
+
+    flameSprite.setPosition(playerSprite.getPosition() + precisionOffset);
     flameSprite.setRotation(playerSprite.getRotation());
 
     window.draw(flameSprite);
