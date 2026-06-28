@@ -5,6 +5,7 @@
 class SpriteAnimator {
 public:
     SpriteAnimator(const sf::Texture& texture, int frameCount, float frameDuration = 0.1f);
+    SpriteAnimator(const sf::Texture& texture, std::vector<sf::IntRect> frames, float frameDuration = 0.1f);
 
     bool update(float deltaTime);
 

@@ -20,7 +20,7 @@ public:
             return it->second(position);
         }
 
-        throw GameException("GameObjectFactory : Type d'objet introuvable ou non enregistre -> " + name);
+        throw GameException("GameObjectFactory : Type of objet not found or not registred -> " + name);
     }
 
 private:

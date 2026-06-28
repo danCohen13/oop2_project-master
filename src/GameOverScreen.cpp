@@ -1,6 +1,7 @@
 ﻿#include "GameOverScreen.h"
 #include "GameplayScreen.h"
 #include "Resources.h"
+#include "HighScoreScreen.h"
 #include <cmath>
 
 #ifndef M_PI
@@ -55,7 +56,7 @@ GameOverScreen::GameOverScreen(ScreenStack& stack, int coins, int distance)
     float cornerRadius = 28.f;
 
     m_panelBase = makeRoundedRect(panelSize, cornerRadius);
-    m_panelBase.setFillColor(sf::Color(40, 60, 95, 95)); 
+    m_panelBase.setFillColor(sf::Color(40, 60, 95, 95));
     m_panelBase.setOrigin({ panelSize.x / 2.f, panelSize.y / 2.f });
     m_panelBase.setPosition(panelCenter);
 
@@ -78,9 +79,15 @@ GameOverScreen::GameOverScreen(ScreenStack& stack, int coins, int distance)
     m_gameOverText.setOrigin({ goSize.x / 2.f, goSize.y / 2.f });
     m_gameOverText.setPosition({ 600.f, 130.f });
 
+    HighScoreScreen::saveScore(m_distance, m_coins);
+
+    auto records = HighScoreScreen::loadScores();
+    int absoluteBest = records.empty() ? m_distance : records[0].distance;
+
     std::string statsStr = "Coins Collected : " + std::to_string(m_coins) + "\n" +
         "Distance Traveled : " + std::to_string(m_distance) + " m\n\n" +
-        "Best Score : " + std::to_string(m_coins) + " (Placeholder)";
+        "Best Distance : " + std::to_string(absoluteBest) + " m";
+
     m_statsText.setString(statsStr);
     m_statsText.setCharacterSize(24);
     m_statsText.setFillColor(sf::Color(225, 235, 255));

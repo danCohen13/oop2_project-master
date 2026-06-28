@@ -16,12 +16,10 @@ int main() {
         return EXIT_FAILURE;
     }
     catch (const std::exception& e) {
-        // Si une exception C++ standard survient (ex: manque de mémoire RAM)
         std::cerr << "\n[STANDARD ERROR] " << e.what() << "\n\n";
         return EXIT_FAILURE;
     }
     catch (...) {
-        // Le filet de sécurité ultime pour les erreurs inconnues
         std::cerr << "\n[FATAL ERROR] Unkown error happened.\n\n";
         return EXIT_FAILURE;
     }

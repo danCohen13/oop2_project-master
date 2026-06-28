@@ -2,6 +2,7 @@
 #include "GameplayScreen.h"
 #include "Resources.h"
 #include "RulesScreen.h"
+#include "HighScoreScreen.h"
 
 MenuScreen::MenuScreen(ScreenStack& stack)
     : Screen(stack),
@@ -40,6 +41,9 @@ void MenuScreen::handleEvent(const sf::Event& event) {
             }
             else if (m_rulesButton->isClicked(clickPos)) {
                 m_stack.push(std::make_unique<RulesScreen>(m_stack));
+            }
+            else if (m_highScoreButton->isClicked(clickPos)) {
+                m_stack.push(std::make_unique<HighScoreScreen>(m_stack));
             }
         }
     }
